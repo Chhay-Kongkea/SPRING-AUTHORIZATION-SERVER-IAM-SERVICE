@@ -1,0 +1,22 @@
+volumes:
+  iam-pg-vol:
+    driver: local
+
+services:
+  iam-postgres:
+    image: postgres:18.4
+    container_name: iam-postgres
+    restart: unless-stopped
+    ports:
+      - "9544:5432"
+    environment:
+      POSTGRES_DB: iam_db
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - iam-pg-vol:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d iam_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

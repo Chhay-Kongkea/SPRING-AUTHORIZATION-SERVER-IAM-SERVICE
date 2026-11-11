@@ -1,0 +1,44 @@
+plugins {
+    id 'spring-boot-common-conventions'
+    id 'gg.jte.gradle' version '3.2.5'
+}
+
+jte {
+    sourceDirectory = file('../iam-web/src/main/jte').toPath()
+    contentType = gg.jte.ContentType.Html
+    generate()
+}
+
+dependencies {
+    implementation project(':iam-domain:iam-domain-core')
+    implementation project(':iam-domain:iam-application-service')
+    implementation project(':iam-persistence')
+    implementation project(':iam-infrastructure')
+    implementation project(':iam-rest-api')
+    implementation project(':iam-web')
+
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-authorization-server'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-liquibase'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.postgresql:postgresql'
+    implementation 'gg.jte:jte:3.2.5'
+    implementation 'gg.jte:jte-spring-boot-starter-4:3.2.5'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+springBoot {
+    mainClass = 'kh.edu.istad.iam.IamApplication'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    systemProperty 'iam.integration', System.getProperty('iam.integration', 'false')
+}

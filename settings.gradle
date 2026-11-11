@@ -1,0 +1,5 @@
+rootProject.name = 'iam-service'
+
+includeBuild 'iam-service'
+includeBuild 'build-logic'
+includeBuild 'istad-common'

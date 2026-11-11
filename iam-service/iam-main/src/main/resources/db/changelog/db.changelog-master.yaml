@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-iam-and-oauth2-schema
+      author: istad
+      changes:
+        - sqlFile:
+            path: ddl/001-create-iam-and-oauth2-schema.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: false
