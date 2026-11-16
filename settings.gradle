@@ -1,0 +1,14 @@
+
+pluginManagement {
+    includeBuild("build-logic")
+
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+rootProject.name = 'iam-service'
+
+includeBuild 'iam-service'
+includeBuild 'build-logic'
+includeBuild 'istad-common'

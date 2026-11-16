@@ -1,0 +1,4 @@
+iam:
+  keys:
+    # Development-only fallback. Production uses application.yml, where this is false.
+    allow-ephemeral: true

@@ -1,0 +1,419 @@
+{
+  "info": {
+    "_postman_id": "cfa5a0c6-45e8-4c2f-9e1d-iam-service",
+    "name": "IAM Service \u2014 OAuth2 / OIDC + REST",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "initialAccessToken",
+      "value": ""
+    },
+    {
+      "key": "username",
+      "value": "sokdara"
+    },
+    {
+      "key": "userUuid",
+      "value": ""
+    },
+    {
+      "key": "roleUuid",
+      "value": ""
+    },
+    {
+      "key": "permissionUuid",
+      "value": ""
+    },
+    {
+      "key": "clientId",
+      "value": ""
+    },
+    {
+      "key": "clientSecret",
+      "value": ""
+    },
+    {
+      "key": "bootstrapClientId",
+      "value": "iam-dcr-bootstrap"
+    },
+    {
+      "key": "bootstrapClientSecret",
+      "value": "replace-with-IAM_DCR_CLIENT_SECRET"
+    }
+  ],
+  "item": [
+    {
+      "name": "Registration",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"sokdara\",\n  \"email\": \"dara.sok@example.com\",\n  \"password\": \"Str0ng!Pass2026\",\n  \"confirmPassword\": \"Str0ng!Pass2026\",\n  \"givenName\": \"Dara\",\n  \"familyName\": \"Sok\",\n  \"locale\": \"km\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('userUuid', body.uuid);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dynamic Client Registration",
+      "item": [
+        {
+          "name": "Get Initial Access Token",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{bootstrapClientId}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{bootstrapClientSecret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                },
+                {
+                  "key": "scope",
+                  "value": "client.create"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/oauth2/token"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('initialAccessToken', pm.response.json().access_token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register OAuth Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{initialAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_name\": \"ISTAD Demo Client\",\n  \"redirect_uris\": [\n    \"https://oauth.pstmn.io/v1/callback\"\n  ],\n  \"grant_types\": [\n    \"authorization_code\",\n    \"refresh_token\"\n  ],\n  \"response_types\": [\n    \"code\"\n  ],\n  \"scope\": \"openid profile email phone address\",\n  \"token_endpoint_auth_method\": \"client_secret_basic\"\n}"
+            },
+            "url": "{{baseUrl}}/connect/register"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('clientId', body.client_id);",
+                  "  pm.collectionVariables.set('clientSecret', body.client_secret);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users?page=0&size=20&sort=createdAt&direction=DESC"
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users/{{userUuid}}"
+          }
+        },
+        {
+          "name": "Get User Authorities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users/{{userUuid}}/authorities"
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"givenName\": \"Dara\",\n  \"nickname\": \"Dara\",\n  \"locale\": \"km\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userUuid}}"
+          }
+        },
+        {
+          "name": "Assign Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleUuids\": [\n    \"{{roleUuid}}\"\n  ],\n  \"reason\": \"Admin assignment\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userUuid}}/roles"
+          }
+        },
+        {
+          "name": "Grant Direct Permission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissionUuids\": [\n    \"{{permissionUuid}}\"\n  ],\n  \"effect\": \"GRANT\",\n  \"reason\": \"Reports access\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{userUuid}}/permissions"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"CONTENT_MANAGER\",\n  \"description\": \"Manages course content\",\n  \"permissionUuids\": []\n}"
+            },
+            "url": "{{baseUrl}}/api/roles"
+          }
+        },
+        {
+          "name": "List Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/roles?page=0&size=20"
+          }
+        },
+        {
+          "name": "Get Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/roles/{{roleUuid}}"
+          }
+        },
+        {
+          "name": "Deactivate Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/roles/{{roleUuid}}/deactivate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permissions",
+      "item": [
+        {
+          "name": "Create Permission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"course\",\n  \"action\": \"publish\",\n  \"description\": \"Publish a course\"\n}"
+            },
+            "url": "{{baseUrl}}/api/permissions"
+          }
+        },
+        {
+          "name": "List Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/permissions?page=0&size=20"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Self Service",
+      "item": [
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/me"
+          }
+        },
+        {
+          "name": "Get My Linked Identities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/me/identities"
+          }
+        }
+      ]
+    }
+  ]
+}
