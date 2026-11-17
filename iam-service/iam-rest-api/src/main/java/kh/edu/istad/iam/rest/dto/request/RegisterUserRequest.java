@@ -1,9 +1,10 @@
-package kh.edu.istad.iam.rest.dto;
+package kh.edu.istad.iam.rest.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
+import kh.edu.istad.iam.rest.dto.PasswordRules;
 
 public record RegisterUserRequest(
         @NotBlank
@@ -16,7 +17,7 @@ public record RegisterUserRequest(
         String email,
 
         @NotBlank
-        @Size(min = 12, max = 128)
+        @Pattern(regexp = PasswordRules.COMPLEXITY, message = PasswordRules.MESSAGE)
         String password,
 
         @NotBlank

@@ -14,6 +14,8 @@ import java.util.List;
 
 public class User extends AggregateRoot<UserId> {
 
+    public static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
+
     private String username;
     private String email;
     private boolean emailVerified;
@@ -74,8 +76,8 @@ public class User extends AggregateRoot<UserId> {
 
         super(id);
 
-        this.username = requireText(username, "Username");
-        this.email = requireText(email, "Email").toLowerCase();
+        this.username = requireText(username, "Username").toLowerCase(java.util.Locale.ROOT);
+        this.email = requireText(email, "Email").toLowerCase(java.util.Locale.ROOT);
         this.passwordHash = passwordHash;
         this.givenName = requireText(givenName, "Given name");
         this.familyName = requireText(familyName, "Family name");
@@ -163,7 +165,7 @@ public class User extends AggregateRoot<UserId> {
 
         User user = new User(id);
 
-        user.username = requireText(username, "Username");
+        user.username = requireText(username, "Username").toLowerCase(java.util.Locale.ROOT);
         user.email = requireText(email, "Email").toLowerCase();
         user.emailVerified = emailVerified;
         user.passwordHash = passwordHash;
@@ -485,6 +487,9 @@ public class User extends AggregateRoot<UserId> {
         ensureNotDeleted();
 
         this.failedLoginAttempts++;
+        if (this.failedLoginAttempts >= MAX_FAILED_LOGIN_ATTEMPTS) {
+            this.accountNonLocked = false;
+        }
 
         touch(actor);
     }

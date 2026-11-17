@@ -39,7 +39,7 @@ public class PermissionOperationsController {
     @PatchMapping
     @PreAuthorize("hasAuthority('permission:update')")
     public Object update(
-            @PathVariable UUID permissionUuid,
+            @PathVariable("permissionUuid") UUID permissionUuid,
             @RequestBody UpdateRequest request
     ) {
         return update.execute(new UpdatePermissionCommand(
@@ -53,21 +53,21 @@ public class PermissionOperationsController {
     @PostMapping("/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('permission:update')")
-    public void activate(@PathVariable UUID permissionUuid) {
+    public void activate(@PathVariable("permissionUuid") UUID permissionUuid) {
         activate.execute(permissionUuid);
     }
 
     @PostMapping("/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('permission:update')")
-    public void deactivate(@PathVariable UUID permissionUuid) {
+    public void deactivate(@PathVariable("permissionUuid") UUID permissionUuid) {
         deactivate.execute(permissionUuid);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('permission:delete')")
-    public void delete(@PathVariable UUID permissionUuid) {
+    public void delete(@PathVariable("permissionUuid") UUID permissionUuid) {
         delete.execute(permissionUuid);
     }
 }

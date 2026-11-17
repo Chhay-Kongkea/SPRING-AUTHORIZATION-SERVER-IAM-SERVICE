@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public final class IamOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class IamOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
     private final FederatedIdentityProvisioner provisioner;
     private final LoadUserForAuthenticationUseCase loadUser;

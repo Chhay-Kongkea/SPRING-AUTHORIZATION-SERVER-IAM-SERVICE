@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 
 import java.util.Map;
 
-public final class IamOidcPrincipal extends IamPrincipal implements OidcUser {
+public class IamOidcPrincipal extends IamPrincipal implements OidcUser {
     private final OidcIdToken idToken;
     private final OidcUserInfo userInfo;
 

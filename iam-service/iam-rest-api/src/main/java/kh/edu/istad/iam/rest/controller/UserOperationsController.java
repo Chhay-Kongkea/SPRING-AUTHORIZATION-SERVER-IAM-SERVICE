@@ -3,7 +3,10 @@ package kh.edu.istad.iam.rest.controller;
 import kh.edu.istad.iam.domain.command.*;
 import kh.edu.istad.iam.domain.usecase.*;
 import kh.edu.istad.iam.domain.valueobject.PermissionEffect;
-import kh.edu.istad.iam.rest.dto.AssignmentRequests;
+import kh.edu.istad.iam.rest.dto.request.AssignmentRequests;
+import kh.edu.istad.iam.rest.dto.request.ResetPasswordRequest;
+import kh.edu.istad.iam.rest.dto.response.IdentityResponse;
+import kh.edu.istad.iam.rest.support.ResponseMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,28 +59,29 @@ public class UserOperationsController {
     @PostMapping("/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void enable(@PathVariable UUID userUuid) {
+    public void enable(@PathVariable("userUuid") UUID userUuid) {
         enable.execute(userUuid);
     }
 
     @PostMapping("/disable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void disable(@PathVariable UUID userUuid) {
+    public void disable(@PathVariable("userUuid") UUID userUuid) {
         disable.execute(userUuid);
     }
 
     @PostMapping("/lock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void lock(@PathVariable UUID userUuid) {
+    public void lock(@PathVariable("userUuid") UUID userUuid) {
         lock.execute(userUuid);
     }
 
     @PostMapping("/unlock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void unlock(@PathVariable UUID userUuid) {
+    public void unlock(@PathVariable("userUuid") UUID userUuid) {
+
         unlock.execute(userUuid);
     }
 
@@ -85,8 +89,8 @@ public class UserOperationsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
     public void resetPassword(
-            @PathVariable UUID userUuid,
-            @RequestBody AssignmentRequests.PasswordReset request
+            @PathVariable("userUuid") UUID userUuid,
+            @Valid @RequestBody ResetPasswordRequest request
     ) {
         resetPassword.execute(new ResetUserPasswordCommand(
                 userUuid,
@@ -97,7 +101,7 @@ public class UserOperationsController {
     @PostMapping("/roles")
     @PreAuthorize("hasAuthority('user:assign')")
     public Object assignRoles(
-            @PathVariable UUID userUuid,
+            @PathVariable("userUuid") UUID userUuid,
             @Valid @RequestBody AssignmentRequests.RoleAssignments request
     ) {
         return assignRoles.execute(new AssignRolesToUserCommand(
@@ -112,9 +116,9 @@ public class UserOperationsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:assign')")
     public void revokeRole(
-            @PathVariable UUID userUuid,
-            @PathVariable UUID roleUuid,
-            @RequestParam(defaultValue = "Revoked by administrator") String reason
+            @PathVariable("userUuid") UUID userUuid,
+            @PathVariable("roleUuid") UUID roleUuid,
+            @RequestParam(name = "reason",defaultValue = "Revoked by administrator") String reason
     ) {
         revokeRole.execute(new RevokeRoleFromUserCommand(
                 userUuid,
@@ -126,14 +130,10 @@ public class UserOperationsController {
     @PostMapping("/permissions")
     @PreAuthorize("hasAuthority('user:assign')")
     public Object grantPermissions(
-            @PathVariable UUID userUuid,
+            @PathVariable("userUuid") UUID userUuid,
             @Valid @RequestBody AssignmentRequests.PermissionGrants request
     ) {
-        PermissionEffect effect = PermissionEffect.valueOf(request.effect().toUpperCase());
-
-        if (effect != PermissionEffect.GRANT && effect != PermissionEffect.DENY) {
-            throw new IllegalArgumentException("Effect must be GRANT or DENY");
-        }
+        PermissionEffect effect = request.effect() == null ? PermissionEffect.GRANT : request.effect();
 
         return grantPermissions.execute(new GrantPermissionsToUserCommand(
                 userUuid,
@@ -148,10 +148,10 @@ public class UserOperationsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:assign')")
     public void revokePermission(
-            @PathVariable UUID userUuid,
-            @PathVariable UUID permissionUuid,
-            @RequestParam(defaultValue = "GRANT") PermissionEffect effect,
-            @RequestParam(defaultValue = "Revoked by administrator") String reason
+            @PathVariable("userUuid") UUID userUuid,
+            @PathVariable("permissionUuid") UUID permissionUuid,
+            @RequestParam(name = "effect",defaultValue = "GRANT") PermissionEffect effect,
+            @RequestParam(name = "reason",defaultValue = "Revoked by administrator") String reason
     ) {
         revokePermission.execute(new RevokePermissionFromUserCommand(
                 userUuid,
@@ -163,16 +163,16 @@ public class UserOperationsController {
 
     @GetMapping("/identities")
     @PreAuthorize("hasAuthority('user:read')")
-    public Object identities(@PathVariable UUID userUuid) {
-        return identities.execute(userUuid);
+    public java.util.List<IdentityResponse> identities(@PathVariable("permissionUuid") UUID userUuid) {
+        return identities.execute(userUuid).stream().map(ResponseMapper::identity).toList();
     }
 
     @DeleteMapping("/identities/{identityUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
     public void unlink(
-            @PathVariable UUID userUuid,
-            @PathVariable UUID identityUuid
+            @PathVariable("permissionUuid") UUID userUuid,
+            @PathVariable("identityUuid") UUID identityUuid
     ) {
         unlinkIdentity.execute(new UnlinkIdentityCommand(
                 userUuid,

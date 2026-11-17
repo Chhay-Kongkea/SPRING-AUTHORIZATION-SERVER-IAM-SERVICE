@@ -1,5 +1,7 @@
 package kh.edu.istad.iam.domain.usecase;
 
+import kh.edu.istad.iam.domain.exception.NotFoundDomainException;
+
 import kh.edu.istad.iam.domain.entity.User;
 import kh.edu.istad.iam.domain.port.out.UserRepository;
 import kh.edu.istad.iam.domain.result.AuthUserResult;
@@ -30,18 +32,11 @@ public class LoadUserForAuthenticationUseCase {
             );
         }
 
-        String identifier = usernameOrEmail.trim();
-
-        User user = userRepository.findByUsername(identifier)
-                .or(() -> userRepository.findByEmail(identifier))
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "User not found"
-                        )
-                );
+        User user = UserLookup.find(userRepository, usernameOrEmail)
+                .orElseThrow(() -> new NotFoundDomainException("User not found"));
 
         if (user.isDeleted()) {
-            throw new IllegalStateException("User account is deleted");
+            throw new NotFoundDomainException("User not found");
         }
 
         UserAuthoritiesResult userAuthorities =

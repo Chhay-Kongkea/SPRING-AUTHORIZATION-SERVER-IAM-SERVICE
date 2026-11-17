@@ -66,7 +66,7 @@ public class Identity extends AggregateRoot<IdentityId> {
         this.displayName = displayName;
         this.username = username;
         this.pictureUrl = pictureUrl;
-        this.attributes = attributes == null ? Map.of() : Map.copyOf(attributes);
+        this.attributes = copyAttributes(attributes);
 
         this.linkedAt = Instant.now();
         this.deleted = false;
@@ -113,7 +113,7 @@ public class Identity extends AggregateRoot<IdentityId> {
         this.displayName = displayName;
         this.username = username;
         this.pictureUrl = pictureUrl;
-        this.attributes = attributes == null ? Map.of() : Map.copyOf(attributes);
+        this.attributes = copyAttributes(attributes);
 
         this.linkedAt = Objects.requireNonNull(linkedAt, "Linked at is required");
         this.lastLoginAt = lastLoginAt;
@@ -214,7 +214,7 @@ public class Identity extends AggregateRoot<IdentityId> {
         this.displayName = displayName;
         this.username = username;
         this.pictureUrl = pictureUrl;
-        this.attributes = attributes == null ? Map.of() : Map.copyOf(attributes);
+        this.attributes = copyAttributes(attributes);
 
         touch(actor);
     }
@@ -311,6 +311,20 @@ public class Identity extends AggregateRoot<IdentityId> {
         return version;
     }
 
+    /** Null-safe, immutable copy: provider payloads routinely contain null values. */
+    private static Map<String, Object> copyAttributes(Map<String, Object> source) {
+        if (source == null) {
+            return Map.of();
+        }
+        Map<String, Object> copy = new java.util.LinkedHashMap<>();
+        source.forEach((key, v) -> {
+            if (key != null && v != null) {
+                copy.put(key, v);
+            }
+        });
+        return java.util.Collections.unmodifiableMap(copy);
+    }
+
     private void ensureNotDeleted() {
         if (deleted) {
             throw new IllegalStateException(
@@ -324,12 +338,12 @@ public class Identity extends AggregateRoot<IdentityId> {
         this.updatedBy = requireText(actor, "Updated by");
     }
 
-    private static String requireText(String value, String field) {
-        if (value == null || value.isBlank()) {
+    private static String requireText(String v, String field) {
+        if (v == null || v.isBlank()) {
             throw new IllegalArgumentException(
                     field + " cannot be blank"
             );
         }
-        return value.trim();
+        return v.trim();
     }
 }

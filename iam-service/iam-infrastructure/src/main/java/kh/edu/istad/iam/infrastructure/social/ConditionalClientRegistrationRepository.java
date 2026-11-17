@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class ConditionalClientRegistrationRepository implements ClientRegistrationRepository, Iterable<ClientRegistration> {
+public class ConditionalClientRegistrationRepository implements ClientRegistrationRepository, Iterable<ClientRegistration> {
     private final Map<String, ClientRegistration> registrations;
 
     public ConditionalClientRegistrationRepository(List<ClientRegistration> registrations) {

@@ -119,7 +119,6 @@ public class UserRepositoryAdapter implements UserRepository {
                     roleEntity
             );
 
-            // Preserve the existing database ID when this is an update.
             if (existing != null) {
                 assignmentEntity.setId(existing.getId());
             }
@@ -191,7 +190,6 @@ public class UserRepositoryAdapter implements UserRepository {
                     permissionEntity
             );
 
-            // Preserve the existing database ID when this is an update.
             if (existing != null) {
                 assignmentEntity.setId(existing.getId());
             }

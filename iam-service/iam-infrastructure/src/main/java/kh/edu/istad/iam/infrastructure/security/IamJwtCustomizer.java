@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public final class IamJwtCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
+public class IamJwtCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
     private final UserRepository users;
 
     public IamJwtCustomizer(UserRepository users) {
@@ -34,10 +34,10 @@ public final class IamJwtCustomizer implements OAuth2TokenCustomizer<JwtEncoding
             List<String> authorities = principal.user().authorities().stream().sorted().toList();
             context.getClaims().claim("authorities", authorities);
             context.getClaims().claim("roles", authorities.stream()
-                    .filter(value -> value.startsWith("ROLE_"))
-                    .map(value -> value.substring(5)).toList());
+                    .filter(v -> v.startsWith("ROLE_"))
+                    .map(v -> v.substring(5)).toList());
             context.getClaims().claim("permissions", authorities.stream()
-                    .filter(value -> !value.startsWith("ROLE_")).toList());
+                    .filter(v -> !v.startsWith("ROLE_")).toList());
             return;
         }
 
@@ -81,7 +81,7 @@ public final class IamJwtCustomizer implements OAuth2TokenCustomizer<JwtEncoding
         }
     }
 
-    private void put(Map<String, Object> claims, String key, Object value) {
-        if (value != null) claims.put(key, value);
+    private void put(Map<String, Object> claims, String key, Object v) {
+        if (v != null) claims.put(key, v);
     }
 }

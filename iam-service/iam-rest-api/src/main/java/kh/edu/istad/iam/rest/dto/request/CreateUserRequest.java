@@ -1,9 +1,10 @@
-package kh.edu.istad.iam.rest.dto;
+package kh.edu.istad.iam.rest.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
+import kh.edu.istad.iam.rest.dto.PasswordRules;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +21,7 @@ public record CreateUserRequest(
         String email,
 
         @NotBlank
-        @Size(min = 12, max = 128)
+        @Pattern(regexp = PasswordRules.COMPLEXITY, message = PasswordRules.MESSAGE)
         String password,
 
         @NotBlank
@@ -43,16 +44,11 @@ public record CreateUserRequest(
         @Pattern(regexp = "en|km")
         String locale,
 
+        @Pattern(regexp = "^\\+[1-9][0-9]{1,14}$", message = "must be in E.164 format")
         String phoneNumber,
-        AddressRequest address,
+        @jakarta.validation.Valid AddressRequest address,
         List<UUID> roleUuids
 ) {
 
-    public record AddressRequest(
-            String streetAddress,
-            String locality,
-            String region,
-            String postalCode,
-            String country
-    ) {}
+
 }

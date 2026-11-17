@@ -3,9 +3,9 @@ package kh.edu.istad.iam;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = "kh.edu.istad.iam")
-public class IamApplication {
+@SpringBootApplication
+public class IamServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(IamApplication.class, args);
+        SpringApplication.run(IamServiceApplication.class, args);
     }
 }

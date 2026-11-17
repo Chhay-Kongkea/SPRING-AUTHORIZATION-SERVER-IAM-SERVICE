@@ -1,3 +1,4 @@
+
 databaseChangeLog:
   - changeSet:
       id: 001-create-iam-and-oauth2-schema
@@ -5,6 +6,26 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: ddl/001-create-iam-and-oauth2-schema.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: false
+
+  - changeSet:
+      id: 002-identity-uniqueness-and-least-privilege
+      author: istad
+      changes:
+        - sqlFile:
+            path: ddl/002-identity-uniqueness-and-least-privilege.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: false
+
+  - changeSet:
+      id: 003-fix-address-country-type
+      author: istad
+      changes:
+        - sqlFile:
+            path: ddl/003-fix-address-country-type.sql
             relativeToChangelogFile: true
             splitStatements: true
             stripComments: false

@@ -12,4 +12,4 @@ public record PermissionId(UUID value) {
     public static PermissionId generate() {
         return new PermissionId(UUID.randomUUID());
     }
-}
+}   

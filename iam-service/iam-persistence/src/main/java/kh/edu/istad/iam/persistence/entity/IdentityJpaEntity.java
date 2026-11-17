@@ -22,7 +22,10 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "identities", uniqueConstraints = {@UniqueConstraint(name = "uk_identities_uuid", columnNames = "uuid"), @UniqueConstraint(name = "uk_identities_provider_subject", columnNames = {"provider", "provider_subject"})})
+@Table(name = "identities", uniqueConstraints =
+                {@UniqueConstraint(name = "uk_identities_uuid", columnNames = "uuid"),
+                @UniqueConstraint(name = "uk_identities_provider_subject",
+                columnNames = {"provider", "provider_subject"})})
 public class IdentityJpaEntity {
 
     @Id

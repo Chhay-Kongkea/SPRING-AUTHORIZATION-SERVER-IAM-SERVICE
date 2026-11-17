@@ -1,9 +1,11 @@
 package kh.edu.istad.iam.infrastructure.config;
 
+
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.proc.SecurityContext;
+import kh.edu.istad.iam.infrastructure.security.OidcClaimsMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,12 +57,14 @@ public class AuthorizationServerConfiguration {
 
     @Bean
     @Order(1)
-    SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, UserRepository users,
+    SecurityFilterChain authorizationServerSecurityFilterChain(
+            HttpSecurity http, UserRepository users,
             RegisteredClientRepository registeredClients,
             OAuth2AuthorizationService authorizationService,
             OAuth2AuthorizationConsentService consentService,
             AuthorizationServerSettings serverSettings,
-            OAuth2TokenGenerator<?> tokenGenerator) throws Exception {
+            OAuth2TokenGenerator<?> tokenGenerator,
+            OidcClaimsMapper claimsMapper) throws Exception {
         http.oauth2AuthorizationServer(server -> {
                     http.securityMatcher(server.getEndpointsMatcher());
                     server.registeredClientRepository(registeredClients)
@@ -68,13 +72,16 @@ public class AuthorizationServerConfiguration {
                             .authorizationConsentService(consentService)
                             .authorizationServerSettings(serverSettings)
                             .tokenGenerator(tokenGenerator);
-                    server.authorizationEndpoint(endpoint -> endpoint.consentPage("/oauth2/consent"));
+                    server.authorizationEndpoint(
+                            endpoint -> endpoint.consentPage("/oauth2/consent"));
                     server.oidc(oidc -> oidc
                             .clientRegistrationEndpoint(Customizer.withDefaults())
-                            .userInfoEndpoint(endpoint -> endpoint.userInfoMapper(context ->
-                                    mapUserInfo(context, users))));
+                            .userInfoEndpoint(endpoint ->
+                                    endpoint.userInfoMapper(context ->
+                                    mapUserInfo(context, users, claimsMapper))));
                 })
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                .oauth2ResourceServer(resource -> resource.jwt(Customizer.withDefaults()))
                 .exceptionHandling(exceptions -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
@@ -83,59 +90,11 @@ public class AuthorizationServerConfiguration {
     }
 
 
-    private OidcUserInfo mapUserInfo(OidcUserInfoAuthenticationContext context, UserRepository users) {
-        String principalName = context.getAuthorization().getPrincipalName();
-        User user;
-        try {
-            user = users.findById(new UserId(UUID.fromString(principalName))).orElse(null);
-        } catch (IllegalArgumentException ignored) {
-            user = null;
-        }
-        if (user == null) {
-            user = users.findByUsername(principalName)
-                    .orElseThrow(() -> new IllegalStateException("Authorized IAM user no longer exists"));
-        }
-        var scopes = context.getAuthorization().getAuthorizedScopes();
-        java.util.Map<String, Object> claims = new java.util.LinkedHashMap<>();
-        claims.put("sub", user.getId().value().toString());
-        if (scopes.contains("profile")) {
-            put(claims, "name", user.getGivenName() + " " + user.getFamilyName());
-            put(claims, "given_name", user.getGivenName());
-            put(claims, "family_name", user.getFamilyName());
-            put(claims, "middle_name", user.getMiddleName());
-            put(claims, "nickname", user.getNickname());
-            put(claims, "preferred_username", user.getUsername());
-            put(claims, "profile", user.getProfileUrl());
-            put(claims, "picture", user.getPictureUrl());
-            put(claims, "website", user.getWebsiteUrl());
-            put(claims, "gender", user.getGender());
-            put(claims, "birthdate", user.getBirthdate() == null ? null : user.getBirthdate().toString());
-            put(claims, "zoneinfo", user.getZoneInfo());
-            put(claims, "locale", user.getLocale());
-            put(claims, "updated_at", user.getUpdatedAt() == null ? null : user.getUpdatedAt().getEpochSecond());
-        }
-        if (scopes.contains("email")) {
-            put(claims, "email", user.getEmail());
-            claims.put("email_verified", user.isEmailVerified());
-        }
-        if (scopes.contains("phone")) {
-            put(claims, "phone_number", user.getPhoneNumber());
-            claims.put("phone_number_verified", user.isPhoneNumberVerified());
-        }
-        if (scopes.contains("address")) {
-            java.util.Map<String, Object> address = new java.util.LinkedHashMap<>();
-            put(address, "street_address", user.getStreetAddress());
-            put(address, "locality", user.getLocality());
-            put(address, "region", user.getRegion());
-            put(address, "postal_code", user.getPostalCode());
-            put(address, "country", user.getCountry());
-            claims.put("address", address);
-        }
-        return new OidcUserInfo(claims);
-    }
-
-    private void put(java.util.Map<String, Object> claims, String key, Object value) {
-        if (value != null) claims.put(key, value);
+    private OidcUserInfo mapUserInfo(OidcUserInfoAuthenticationContext context, UserRepository users,
+                                     OidcClaimsMapper claimsMapper) {
+        User user = users.findById(new UserId(UUID.fromString(context.getAuthorization().getPrincipalName())))
+                .orElseThrow(() -> new IllegalStateException("Authorized IAM user no longer exists"));
+        return new OidcUserInfo(claimsMapper.claims(user, context.getAuthorization().getAuthorizedScopes()));
     }
 
     @Bean
@@ -180,7 +139,7 @@ public class AuthorizationServerConfiguration {
             if (!allowEphemeral) {
                 throw new IllegalStateException("A persistent RSA signing key pair is required");
             }
-            // Local development fallback only. Production must configure a persistent key pair.
+
             rsaKey = new RSAKeyGenerator(2048).keyID("iam-dev-ephemeral-key").generate();
         }
         return new ImmutableJWKSet<>(new JWKSet(rsaKey));
@@ -194,7 +153,7 @@ public class AuthorizationServerConfiguration {
 
     @Bean
     OAuth2TokenGenerator<?> tokenGenerator(JwtEncoder jwtEncoder,
-            OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
+                                           OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
         JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
         jwtGenerator.setJwtCustomizer(jwtCustomizer);
         return new DelegatingOAuth2TokenGenerator(

@@ -8,8 +8,9 @@ import kh.edu.istad.iam.domain.result.PageResult;
 import kh.edu.istad.iam.domain.result.UserResult;
 import kh.edu.istad.iam.domain.result.UserSummaryResult;
 import kh.edu.istad.iam.domain.usecase.*;
-import kh.edu.istad.iam.rest.dto.CreateUserRequest;
+import kh.edu.istad.iam.rest.dto.request.CreateUserRequest;
 import jakarta.validation.Valid;
+import kh.edu.istad.iam.rest.dto.request.UpdateUserProfileRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,6 +54,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('user:create')")
     public Object create(@Valid @RequestBody CreateUserRequest request) {
         UserResult result = createUser.execute(new CreateUserCommand(
+                request.roleUuids(),
                 request.username(),
                 request.email(),
                 request.password(),
@@ -91,10 +93,11 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasAuthority('user:read')")
     public PageResult<UserSummaryResult> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt") String sort,
-            @RequestParam(defaultValue = "DESC") PageQuery.SortDirection direction
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size,
+            @RequestParam(name = "sort", defaultValue = "createdAt") String sort,
+            @RequestParam(name = "direction", defaultValue = "DESC")
+            PageQuery.SortDirection direction
     ) {
         return listUsers.execute(new PageQuery(page, size, sort, direction));
     }
@@ -123,7 +126,7 @@ public class UserController {
     @PatchMapping("/{uuid}")
     @PreAuthorize("hasAuthority('user:update')")
     public Object update(
-            @PathVariable UUID uuid,
+            @PathVariable("uuid") UUID uuid,
             @RequestBody ProfilePatch request
     ) {
         return toResponse(updateProfile.execute(new UpdateUserProfileCommand(
@@ -150,7 +153,7 @@ public class UserController {
 
     @GetMapping("/{uuid}")
     @PreAuthorize("hasAuthority('user:read')")
-    public Map<String, Object> get(@PathVariable UUID uuid) {
+    public Map<String, Object> get(@PathVariable("uuid") UUID uuid) {
         return toResponse(getUser.execute(uuid));
     }
 
@@ -173,14 +176,25 @@ public class UserController {
 
     @GetMapping("/{uuid}/authorities")
     @PreAuthorize("hasAuthority('user:read')")
-    public Object authorities(@PathVariable UUID uuid) {
+    public Object authorities(@PathVariable("uuid") UUID uuid) {
         return getAuthorities.execute(uuid);
     }
 
     @DeleteMapping("/{uuid}")
     @ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:delete')")
-    public void delete(@PathVariable UUID uuid) {
+    public void delete(@PathVariable("uuid") UUID uuid) {
         deleteUser.execute(uuid);
+    }
+
+
+    static UpdateUserProfileCommand toCommand(UUID userId, UpdateUserProfileRequest r) {
+        var a = r.address();
+        return new UpdateUserProfileCommand(userId, r.givenName(), r.familyName(), r.middleName(), r.nickname(),
+                r.gender(), r.birthdate(), r.profileUrl(), r.pictureUrl(), r.websiteUrl(), r.zoneinfo(),
+                r.locale(), r.phoneNumber(),
+                a == null ? null : a.streetAddress(), a == null ? null : a.locality(),
+                a == null ? null : a.region(), a == null ? null : a.postalCode(),
+                a == null ? null : a.country());
     }
 }

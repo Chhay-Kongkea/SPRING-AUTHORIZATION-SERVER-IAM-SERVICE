@@ -2,7 +2,7 @@ package kh.edu.istad.iam.rest.controller;
 
 import kh.edu.istad.iam.domain.command.*;
 import kh.edu.istad.iam.domain.usecase.*;
-import kh.edu.istad.iam.rest.dto.AssignmentRequests;
+import kh.edu.istad.iam.rest.dto.request.AssignmentRequests;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,7 +40,7 @@ public class RoleOperationsController {
     @PatchMapping
     @PreAuthorize("hasAuthority('role:update')")
     public Object update(
-            @PathVariable UUID roleUuid,
+            @PathVariable("roleUuid") UUID roleUuid,
             @RequestBody MapRequest request
     ) {
         return update.execute(new UpdateRoleCommand(
@@ -56,28 +56,28 @@ public class RoleOperationsController {
     @PostMapping("/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('role:update')")
-    public void activate(@PathVariable UUID roleUuid) {
+    public void activate(@PathVariable("roleUuid") UUID roleUuid) {
         activate.execute(roleUuid);
     }
 
     @PostMapping("/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('role:update')")
-    public void deactivate(@PathVariable UUID roleUuid) {
+    public void deactivate(@PathVariable("roleUuid") UUID roleUuid) {
         deactivate.execute(roleUuid);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('role:delete')")
-    public void delete(@PathVariable UUID roleUuid) {
+    public void delete(@PathVariable("roleUuid") UUID roleUuid) {
         delete.execute(roleUuid);
     }
 
     @PostMapping("/permissions")
     @PreAuthorize("hasAuthority('role:assign')")
     public Object assignPermissions(
-            @PathVariable UUID roleUuid,
+            @PathVariable("roleUuid") UUID roleUuid,
             @Valid @RequestBody AssignmentRequests.RolePermissions request
     ) {
         return assignPermissions.execute(new AssignPermissionsToRoleCommand(
@@ -92,9 +92,9 @@ public class RoleOperationsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('role:assign')")
     public void revokePermission(
-            @PathVariable UUID roleUuid,
-            @PathVariable UUID permissionUuid,
-            @RequestParam(defaultValue = "Revoked by administrator") String reason
+            @PathVariable("roleUuid") UUID roleUuid,
+            @PathVariable("permissionUuid") UUID permissionUuid,
+            @RequestParam(name = "reason",defaultValue = "Revoked by administrator") String reason
     ) {
         revokePermission.execute(new RevokePermissionFromRoleCommand(
                 roleUuid,

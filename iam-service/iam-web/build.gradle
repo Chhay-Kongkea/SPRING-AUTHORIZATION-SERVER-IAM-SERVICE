@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api 'kh.edu.istad:iam-application-service'
+    api 'kh.edu.istad:iam-infrastructure'
 
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-security'

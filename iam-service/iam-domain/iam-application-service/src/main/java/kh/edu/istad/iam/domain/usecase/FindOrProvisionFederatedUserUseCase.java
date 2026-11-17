@@ -1,6 +1,9 @@
 
 package kh.edu.istad.iam.domain.usecase;
 
+import kh.edu.istad.iam.domain.exception.ConflictDomainException;
+import kh.edu.istad.iam.domain.valueobject.IdentityProvider;
+
 import kh.edu.istad.iam.domain.command.FindOrProvisionFederatedUserCommand;
 import kh.edu.istad.iam.domain.entity.Identity;
 import kh.edu.istad.iam.domain.entity.User;
@@ -75,7 +78,8 @@ public class FindOrProvisionFederatedUserUseCase {
                             )
                     );
 
-            if (user.isDeleted() || !user.isEnabled()) {
+            if (user.isDeleted() || !user.isEnabled()
+                    || !user.isAccountNonLocked() || !user.isAccountNonExpired()) {
                 throw new IllegalStateException(
                         "User account is not available"
                 );
@@ -105,16 +109,19 @@ public class FindOrProvisionFederatedUserUseCase {
             );
         }
 
-        String email = normalizeAndValidateEmail(command.email());
+        boolean placeholderEmail = command.email() == null || command.email().isBlank();
+        String email = placeholderEmail
+                ? placeholderEmail(command.provider(), command.providerSubject().trim())
+                : normalizeAndValidateEmail(command.email());
+        boolean emailVerified = command.emailVerified() && !placeholderEmail;
 
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalStateException(
+            throw new ConflictDomainException(
                     "An account with this email already exists. "
                             + "Authenticate with that account and link "
                             + "the external identity explicitly."
             );
         }
-
         String username = resolveUsername(command.username(), email);
 
         String displayName = command.displayName();
@@ -147,7 +154,7 @@ public class FindOrProvisionFederatedUserUseCase {
         }
         user.assignRole(defaultRole.getId(), actor, null, "Default federated registration role");
 
-        if (command.emailVerified()) {
+        if (emailVerified) {
             user.verifyEmail(actor);
         }
 
@@ -159,7 +166,7 @@ public class FindOrProvisionFederatedUserUseCase {
                 command.provider(),
                 command.providerSubject().trim(),
                 email,
-                command.emailVerified(),
+                emailVerified,
                 command.displayName(),
                 command.username(),
                 command.pictureUrl(),
@@ -179,6 +186,11 @@ public class FindOrProvisionFederatedUserUseCase {
         );
     }
 
+    private static String placeholderEmail(IdentityProvider provider, String subject) {
+        String safeSubject = subject.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9._-]", "");
+        return provider.name().toLowerCase(Locale.ROOT) + "." + safeSubject + "@users.noreply.iam.invalid";
+    }
+
     private String normalizeAndValidateEmail(String email) {
 
         if (email == null || email.isBlank()) {
@@ -190,7 +202,7 @@ public class FindOrProvisionFederatedUserUseCase {
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
 
         String emailPattern =
-                "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$";
+                "(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$";
 
         if (!normalizedEmail.matches(emailPattern)) {
             throw new IllegalArgumentException("Invalid email format");

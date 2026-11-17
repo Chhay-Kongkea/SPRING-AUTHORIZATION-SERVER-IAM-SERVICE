@@ -4,24 +4,30 @@ import kh.edu.istad.iam.domain.command.CreateUserCommand;
 import kh.edu.istad.iam.domain.entity.User;
 import kh.edu.istad.iam.domain.port.out.CurrentActorProvider;
 import kh.edu.istad.iam.domain.port.out.PasswordHasher;
+import kh.edu.istad.iam.domain.port.out.RoleRepository;
 import kh.edu.istad.iam.domain.port.out.UserRepository;
 import kh.edu.istad.iam.domain.result.UserResult;
 import kh.edu.istad.iam.domain.valueobject.UserId;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 
 public class CreateUserUseCase {
 
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
     private final CurrentActorProvider currentActorProvider;
+    private final RoleRepository roleRepository;
 
     public CreateUserUseCase(
             UserRepository userRepository,
             PasswordHasher passwordHasher,
-            CurrentActorProvider currentActorProvider
+            CurrentActorProvider currentActorProvider,
+            RoleRepository roleRepository
     ) {
+        this.roleRepository = Objects.requireNonNull(roleRepository);
         this.userRepository = Objects.requireNonNull(userRepository);
         this.passwordHasher = Objects.requireNonNull(passwordHasher);
         this.currentActorProvider = Objects.requireNonNull(currentActorProvider);
@@ -31,7 +37,7 @@ public class CreateUserUseCase {
 
         Objects.requireNonNull(command, "Create user command cannot be null");
 
-        String username = requireText(command.username(), "Username");
+        String username = requireText(command.username(), "Username").toLowerCase(java.util.Locale.ROOT);
         String email = requireText(command.email(), "Email")
                 .toLowerCase(Locale.ROOT);
         String rawPassword = requireText(command.rawPassword(), "Password");
@@ -45,13 +51,13 @@ public class CreateUserUseCase {
         }
 
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalStateException(
+            throw new kh.edu.istad.iam.domain.exception.ConflictDomainException(
                     "Username already exists: " + username
             );
         }
 
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalStateException(
+            throw new kh.edu.istad.iam.domain.exception.ConflictDomainException(
                     "Email already exists: " + email
             );
         }
@@ -80,6 +86,8 @@ public class CreateUserUseCase {
             user.verifyEmail(actor);
         }
 
+        assignInitialRoles(user, command.roleIds(), actor);
+
         User savedUser = userRepository.save(user);
 
         return new UserResult(
@@ -94,6 +102,24 @@ public class CreateUserUseCase {
                 savedUser.getCreatedAt(),
                 savedUser.getUpdatedAt()
         );
+    }
+
+    private void assignInitialRoles(User user, List<UUID> roleIds, String actor) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            var defaultRole = roleRepository.findByName("USER")
+                    .orElseThrow(() -> new IllegalStateException("Default USER role has not been seeded"));
+            user.assignRole(defaultRole.getId(), actor, null, "Default role on user creation");
+            return;
+        }
+        for (java.util.UUID roleUuid : new java.util.LinkedHashSet<>(roleIds)) {
+            var role = roleRepository.findById(new kh.edu.istad.iam.domain.valueobject.RoleId(roleUuid))
+                    .orElseThrow(() -> new kh.edu.istad.iam.domain.exception.NotFoundDomainException(
+                            "Role not found: " + roleUuid));
+            if (!role.isActive()) {
+                throw new IllegalStateException("Cannot assign inactive role: " + role.getName());
+            }
+            user.assignRole(role.getId(), actor, null, "Assigned during user creation");
+        }
     }
 
     private String requireText(String value, String fieldName) {

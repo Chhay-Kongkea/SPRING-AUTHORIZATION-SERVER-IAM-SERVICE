@@ -1,4 +1,4 @@
-package kh.edu.istad.iam.rest.dto;
+package kh.edu.istad.iam.rest.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

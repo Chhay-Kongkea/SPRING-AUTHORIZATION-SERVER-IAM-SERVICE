@@ -7,7 +7,7 @@ import kh.edu.istad.iam.domain.result.PermissionResult;
 import kh.edu.istad.iam.domain.usecase.CreatePermissionUseCase;
 import kh.edu.istad.iam.domain.usecase.GetPermissionUseCase;
 import kh.edu.istad.iam.domain.usecase.ListPermissionsUseCase;
-import kh.edu.istad.iam.rest.dto.CreatePermissionRequest;
+import kh.edu.istad.iam.rest.dto.request.CreatePermissionRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,7 +46,7 @@ public class PermissionController {
 
     @GetMapping("/{uuid}")
     @PreAuthorize("hasAuthority('permission:read')")
-    public PermissionResult get(@PathVariable UUID uuid) {
+    public PermissionResult get(@PathVariable("uuid") UUID uuid) {
         return getPermission.execute(uuid);
     }
 

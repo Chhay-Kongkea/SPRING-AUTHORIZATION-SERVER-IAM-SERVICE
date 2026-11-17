@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class SecurityCurrentActorProvider implements CurrentActorProvider {
+public class SecurityCurrentActorProvider implements CurrentActorProvider {
     @Override
     public String getCurrentActor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

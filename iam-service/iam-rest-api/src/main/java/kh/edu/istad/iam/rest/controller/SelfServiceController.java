@@ -1,20 +1,31 @@
 package kh.edu.istad.iam.rest.controller;
 
+import jakarta.validation.Valid;
 import kh.edu.istad.iam.domain.command.ChangePasswordCommand;
 import kh.edu.istad.iam.domain.command.UnlinkIdentityCommand;
-import kh.edu.istad.iam.domain.command.UpdateUserProfileCommand;
-import kh.edu.istad.iam.domain.usecase.*;
-import kh.edu.istad.iam.rest.dto.AssignmentRequests;
+import kh.edu.istad.iam.domain.usecase.ChangePasswordUseCase;
+import kh.edu.istad.iam.domain.usecase.GetUserIdentitiesUseCase;
+import kh.edu.istad.iam.domain.usecase.GetUserUseCase;
+import kh.edu.istad.iam.domain.usecase.UnlinkIdentityUseCase;
+import kh.edu.istad.iam.domain.usecase.UpdateUserProfileUseCase;
+import kh.edu.istad.iam.rest.dto.request.ChangePasswordRequest;
+import kh.edu.istad.iam.rest.dto.request.UpdateUserProfileRequest;
+import kh.edu.istad.iam.rest.dto.response.IdentityResponse;
+import kh.edu.istad.iam.rest.dto.response.UserResponse;
+import kh.edu.istad.iam.rest.support.CurrentUser;
+import kh.edu.istad.iam.rest.support.ResponseMapper;
+import kh.edu.istad.iam.rest.support.UserResponseAssembler;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/me")
 public class SelfServiceController {
 
@@ -23,93 +34,48 @@ public class SelfServiceController {
     private final ChangePasswordUseCase changePassword;
     private final GetUserIdentitiesUseCase identities;
     private final UnlinkIdentityUseCase unlinkIdentity;
+    private final UserResponseAssembler assembler;
 
-    public SelfServiceController(
-            GetUserUseCase getUser,
-            UpdateUserProfileUseCase updateProfile,
-            ChangePasswordUseCase changePassword,
-            GetUserIdentitiesUseCase identities,
-            UnlinkIdentityUseCase unlinkIdentity
-    ) {
+    public SelfServiceController(GetUserUseCase getUser, UpdateUserProfileUseCase updateProfile,
+                                 ChangePasswordUseCase changePassword, GetUserIdentitiesUseCase identities,
+                                 UnlinkIdentityUseCase unlinkIdentity, UserResponseAssembler assembler) {
         this.getUser = getUser;
         this.updateProfile = updateProfile;
         this.changePassword = changePassword;
         this.identities = identities;
         this.unlinkIdentity = unlinkIdentity;
+        this.assembler = assembler;
     }
 
     @GetMapping
-    public Object me(@AuthenticationPrincipal Jwt jwt) {
-        return getUser.execute(UUID.fromString(jwt.getSubject()));
+    public UserResponse me(@AuthenticationPrincipal Jwt jwt) {
+        return assembler.assemble(getUser.execute(CurrentUser.id(jwt)));
     }
 
     @PatchMapping
-    public Object update(
-            @AuthenticationPrincipal Jwt jwt,
-            @RequestBody AssignmentRequests.ProfileUpdate request
-    ) {
-        UUID id = UUID.fromString(jwt.getSubject());
-
-        return updateProfile.execute(new UpdateUserProfileCommand(
-                id,
-                request.givenName(),
-                request.familyName(),
-                null,
-                request.nickname(),
-                request.gender(),
-                request.birthdate(),
-                request.profileUrl(),
-                request.pictureUrl(),
-                request.websiteUrl(),
-                request.zoneinfo(),
-                request.locale(),
-                request.phoneNumber(),
-                request.streetAddress(),
-                request.locality(),
-                request.region(),
-                request.postalCode(),
-                request.country()
-        ));
-    }
-
-    public record PasswordChange(
-            String currentPassword,
-            String newPassword,
-            String confirmPassword
-    ) {
+    public UserResponse update(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody UpdateUserProfileRequest request) {
+        return assembler.assemble(updateProfile.execute(UserController.toCommand(CurrentUser.id(jwt), request)));
     }
 
     @PutMapping("/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(
-            @AuthenticationPrincipal Jwt jwt,
-            @RequestBody PasswordChange request
-    ) {
+    public void changePassword(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody ChangePasswordRequest request) {
         if (!request.newPassword().equals(request.confirmPassword())) {
             throw new IllegalArgumentException("Password confirmation does not match");
         }
-
         changePassword.execute(new ChangePasswordCommand(
-                UUID.fromString(jwt.getSubject()),
-                request.currentPassword(),
-                request.newPassword()
-        ));
+                CurrentUser.id(jwt), request.currentPassword(), request.newPassword()));
     }
 
     @GetMapping("/identities")
-    public Object identities(@AuthenticationPrincipal Jwt jwt) {
-        return identities.execute(UUID.fromString(jwt.getSubject()));
+    public List<IdentityResponse> identities(@AuthenticationPrincipal Jwt jwt) {
+        return identities.execute(CurrentUser.id(jwt)).stream().map(ResponseMapper::identity).toList();
     }
 
     @DeleteMapping("/identities/{identityUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void unlink(
-            @AuthenticationPrincipal Jwt jwt,
-            @PathVariable UUID identityUuid
-    ) {
-        unlinkIdentity.execute(new UnlinkIdentityCommand(
-                UUID.fromString(jwt.getSubject()),
-                identityUuid
-        ));
+    public void unlink(@AuthenticationPrincipal Jwt jwt,
+                       @PathVariable("identityUuid") UUID identityUuid) {
+        unlinkIdentity.execute(new UnlinkIdentityCommand(CurrentUser.id(jwt), identityUuid));
     }
 }

@@ -19,9 +19,19 @@ public class WebSecurityConfiguration {
             IamOAuth2UserService oauth2UserService,
             IamOidcUserService oidcUserService) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/login", "/register", "/auth/telegram/callback", "/oauth2/authorization/**", "/login/oauth2/code/**", "/assets/**", "/css/**", "/images/**").permitAll()
+                        .requestMatchers("/",
+                                "/login",
+                                "/register",
+                                "/auth/telegram/callback",
+                                "/oauth2/authorization/**",
+                                "/login/oauth2/code/**",
+                                "/assets/**",
+                                "/css/**",
+                                "/images/**")
+                        .permitAll()
                         .anyRequest().authenticated())
-                .formLogin(form -> form.loginPage("/login").permitAll())
+                .formLogin(form ->
+                        form.loginPage("/login").permitAll())
                 .oauth2Login(oauth -> oauth
                         .loginPage("/login")
                         .userInfoEndpoint(user -> user

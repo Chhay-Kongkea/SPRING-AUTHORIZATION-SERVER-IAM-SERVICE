@@ -44,6 +44,8 @@ public class GetUserAuthoritiesUseCase {
         ));
 
         Set<String> roles = new HashSet<>();
+        java.util.List<UserAuthoritiesResult.RoleGrant> roleGrants = new java.util.ArrayList<>();
+        java.util.List<UserAuthoritiesResult.DirectPermission> direct = new java.util.ArrayList<>();
         Set<String> grantedPermissions = new HashSet<>();
         Set<String> deniedPermissions = new HashSet<>();
 
@@ -66,6 +68,8 @@ public class GetUserAuthoritiesUseCase {
                     }
 
                     roles.add(role.getName());
+                    roleGrants.add(new UserAuthoritiesResult.RoleGrant(
+                            role.getId().value(), role.getName(), assignment.getExpiresAt()));
 
                     role.getPermissions().stream()
                             .filter(RolePermission -> RolePermission.isActive())
@@ -101,6 +105,10 @@ public class GetUserAuthoritiesUseCase {
                         return;
                     }
 
+                    direct.add(new UserAuthoritiesResult.DirectPermission(
+                            permission.getId().value(), permission.getName(),
+                            assignment.getEffect(), assignment.getExpiresAt()));
+
                     if (assignment.getEffect() == PermissionEffect.GRANT) {
                         grantedPermissions.add(permission.getName());
                     } else if (assignment.getEffect() == PermissionEffect.DENY) {
@@ -113,7 +121,9 @@ public class GetUserAuthoritiesUseCase {
         return new UserAuthoritiesResult(
                 user.getId().value().toString(),
                 roles,
-                grantedPermissions
+                grantedPermissions,
+                roleGrants,
+                direct
         );
     }
 }

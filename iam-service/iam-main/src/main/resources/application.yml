@@ -24,6 +24,7 @@ iam:
       client-secret: ${FACEBOOK_CLIENT_SECRET:}
   telegram:
     bot-token: ${TELEGRAM_BOT_TOKEN:}
+    bot-username: ${TELEGRAM_BOT_USERNAME:}
   bootstrap-admin:
     username: ${IAM_ADMIN_USERNAME:}
     email: ${IAM_ADMIN_EMAIL:}
@@ -39,7 +40,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:9544/iam_db}
     username: ${DB_USERNAME:iteuser}
-    password: ${DB_PASSWORD:change-me}
+    password: ${DB_PASSWORD:kea1213}
     hikari:
       maximum-pool-size: 15
       minimum-idle: 3
@@ -60,11 +61,17 @@ spring:
     encoding: UTF-8
     fallback-to-system-locale: false
 
+#gg:
+#  jte:
+#    templateLocation: ../iam-web/src/main/jte
+#    templateSuffix: .jte
+#    developmentMode: true
 gg:
   jte:
     templateLocation: ../iam-web/src/main/jte
     templateSuffix: .jte
-    developmentMode: ${JTE_DEV_MODE:false}
+    developmentMode: false
+    usePrecompiledTemplates: true
 
 management:
   endpoints:
@@ -78,4 +85,7 @@ management:
 
 logging:
   level:
-    org.springframework.security: INFO
+    org.springframework.security: TRACE
+    org.springframework.web.servlet.DispatcherServlet: TRACE
+    org.springframework.web.servlet.view: TRACE
+    gg.jte: DEBUG

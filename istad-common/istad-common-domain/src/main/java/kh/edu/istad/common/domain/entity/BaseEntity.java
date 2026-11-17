@@ -30,13 +30,11 @@ public abstract class BaseEntity<ID> {
 
         BaseEntity<?> that = (BaseEntity<?>) object;
 
-        // Two new entities without IDs are not equal.
         return id != null && id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        // Keep the hash stable while an entity receives its database ID.
         return Objects.hash(getClass());
     }
 }

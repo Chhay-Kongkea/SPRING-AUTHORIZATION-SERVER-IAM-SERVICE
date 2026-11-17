@@ -9,7 +9,7 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.stereotype.Component;
 
 @Component
-public final class AuthenticationAuditListener {
+public class AuthenticationAuditListener {
     private final RecordLoginAttemptUseCase recordLoginAttempt;
 
     public AuthenticationAuditListener(RecordLoginAttemptUseCase recordLoginAttempt) {

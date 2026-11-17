@@ -1,5 +1,9 @@
 package kh.edu.istad.iam.domain.usecase;
 
+import kh.edu.istad.iam.domain.exception.ConflictDomainException;
+
+import kh.edu.istad.iam.domain.exception.NotFoundDomainException;
+
 import kh.edu.istad.iam.domain.command.LinkIdentityCommand;
 import kh.edu.istad.iam.domain.entity.Identity;
 import kh.edu.istad.iam.domain.entity.User;
@@ -47,18 +51,25 @@ public class LinkIdentityUseCase {
 
         User user = userRepository.findById(new UserId(command.userId()))
                 .orElseThrow(() ->
-                        new IllegalArgumentException("User not found")
+                        new NotFoundDomainException("User not found")
                 );
 
         if (user.isDeleted() || !user.isEnabled()) {
             throw new IllegalStateException("User account is not available");
         }
 
+        boolean providerAlreadyLinked = identityRepository.findAllByUserId(user.getId()).stream()
+                .anyMatch(existing -> existing.getProvider() == command.provider());
+        if (providerAlreadyLinked) {
+            throw new ConflictDomainException(
+                    "A " + command.provider() + " account is already linked to this user");
+        }
+
         if (identityRepository.existsByProviderAndSubject(
                 command.provider(),
                 command.providerSubject()
         )) {
-            throw new IllegalStateException(
+            throw new ConflictDomainException(
                     "This external identity is already linked to an account"
             );
         }

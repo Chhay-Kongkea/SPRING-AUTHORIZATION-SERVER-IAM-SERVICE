@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import kh.edu.istad.iam.infrastructure.security.IamPrincipal;
 
 @Service
-public final class IamOidcUserService implements OAuth2UserService<OidcUserRequest, OidcUser> {
+public class IamOidcUserService implements OAuth2UserService<OidcUserRequest, OidcUser> {
     private final OidcUserService delegate = new OidcUserService();
     private final FederatedIdentityProvisioner provisioner;
     private final LoadUserForAuthenticationUseCase loadUser;

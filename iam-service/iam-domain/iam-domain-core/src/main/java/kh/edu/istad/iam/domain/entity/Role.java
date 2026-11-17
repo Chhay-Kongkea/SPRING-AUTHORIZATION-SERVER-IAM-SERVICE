@@ -180,7 +180,8 @@ public class Role extends AggregateRoot<RoleId> {
 
     public void revokePermission(
             PermissionId permissionId,
-            String actor
+            String actor,
+            String reason
     ) {
         ensureNotDeleted();
 
@@ -194,7 +195,7 @@ public class Role extends AggregateRoot<RoleId> {
                         "Active permission assignment not found"
                 ));
 
-        rolePermission.revoke(actor);
+        rolePermission.revoke(actor, reason);
         touch(actor);
     }
 

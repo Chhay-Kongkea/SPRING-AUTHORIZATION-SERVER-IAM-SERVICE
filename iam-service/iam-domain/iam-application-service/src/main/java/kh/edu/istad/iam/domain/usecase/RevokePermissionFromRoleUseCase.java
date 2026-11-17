@@ -45,7 +45,8 @@ public class RevokePermissionFromRoleUseCase {
 
         role.revokePermission(
                 new PermissionId(command.permissionId()),
-                actor
+                actor,
+                command.reason()
         );
 
         roleRepository.save(role);

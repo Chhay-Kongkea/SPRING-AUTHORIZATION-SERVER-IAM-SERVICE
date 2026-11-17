@@ -10,7 +10,7 @@ import kh.edu.istad.iam.domain.usecase.CreateRoleUseCase;
 import kh.edu.istad.iam.domain.usecase.AssignPermissionsToRoleUseCase;
 import kh.edu.istad.iam.domain.usecase.GetRoleUseCase;
 import kh.edu.istad.iam.domain.usecase.ListRolesUseCase;
-import kh.edu.istad.iam.rest.dto.CreateRoleRequest;
+import kh.edu.istad.iam.rest.dto.request.CreateRoleRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,6 +44,7 @@ public class RoleController {
     @PreAuthorize("hasAuthority('role:create')")
     public RoleResult create(@Valid @RequestBody CreateRoleRequest request) {
         RoleResult role = createRole.execute(new CreateRoleCommand(
+                request.permissionUuids(),
                 request.name(),
                 request.description()
         ));
@@ -64,17 +65,17 @@ public class RoleController {
 
     @GetMapping("/{uuid}")
     @PreAuthorize("hasAuthority('role:read')")
-    public RoleResult get(@PathVariable UUID uuid) {
+    public RoleResult get(@PathVariable("uuid") UUID uuid) {
         return getRole.execute(uuid);
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('role:read')")
     public PageResult<RoleSummaryResult> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt") String sort,
-            @RequestParam(defaultValue = "DESC") PageQuery.SortDirection direction
+            @RequestParam(name = "page",defaultValue = "0") int page,
+            @RequestParam(name = "size",defaultValue = "20") int size,
+            @RequestParam(name = "sort",defaultValue = "createdAt") String sort,
+            @RequestParam(name = "direction",defaultValue = "DESC") PageQuery.SortDirection direction
     ) {
         return listRoles.execute(new PageQuery(page, size, sort, direction));
     }

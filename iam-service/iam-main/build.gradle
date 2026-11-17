@@ -20,6 +20,8 @@ dependencies {
     implementation 'kh.edu.istad:iam-rest-api'
     implementation 'kh.edu.istad:iam-web'
 
+    implementation "kh.edu.istad:istad-common-swagger"
+
     implementation 'io.swagger.core.v3:swagger-annotations:3.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-security'

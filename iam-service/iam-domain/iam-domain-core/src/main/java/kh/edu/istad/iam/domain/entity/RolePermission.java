@@ -93,7 +93,7 @@ public class RolePermission extends BaseEntity<Long> {
         );
     }
 
-    public void revoke(String actor) {
+    public void revoke(String actor, String reason) {
         if (revokedAt != null) {
             throw new IllegalStateException(
                     "Permission assignment is already revoked"
@@ -106,6 +106,9 @@ public class RolePermission extends BaseEntity<Long> {
 
         this.revokedAt = Instant.now();
         this.revokedBy = actor;
+        if (reason != null && !reason.isBlank()) {
+            this.reason = reason.trim();
+        }
     }
 
     public boolean isActive() {

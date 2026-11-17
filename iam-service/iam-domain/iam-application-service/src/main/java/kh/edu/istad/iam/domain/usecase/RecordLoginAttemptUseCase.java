@@ -30,15 +30,8 @@ public class RecordLoginAttemptUseCase {
             );
         }
 
-        String identifier = command.usernameOrEmail()
-                .trim()
-                .toLowerCase(Locale.ROOT);
-
-        User user = userRepository.findByUsername(identifier)
-                .or(() -> userRepository.findByEmail(identifier))
-                .orElseThrow(() -> new NotFoundDomainException(
-                        "User not found"
-                ));
+        User user = UserLookup.find(userRepository, command.usernameOrEmail())
+                .orElseThrow(() -> new NotFoundDomainException("User not found"));
 
         if (command.successful()) {
             user.recordSuccessfulLogin(currentActorProvider.getCurrentActor());

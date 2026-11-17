@@ -3,7 +3,7 @@ package kh.edu.istad.iam.rest.controller;
 import kh.edu.istad.iam.domain.command.RegisterUserCommand;
 import kh.edu.istad.iam.domain.result.UserResult;
 import kh.edu.istad.iam.domain.usecase.RegisterUserUseCase;
-import kh.edu.istad.iam.rest.dto.RegisterUserRequest;
+import kh.edu.istad.iam.rest.dto.request.RegisterUserRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

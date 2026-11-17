@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public final class JdbcConnectedApplicationsRepository implements ConnectedApplicationsRepository {
+public class JdbcConnectedApplicationsRepository implements ConnectedApplicationsRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public JdbcConnectedApplicationsRepository(JdbcTemplate jdbcTemplate) {
