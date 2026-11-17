@@ -1,5 +1,6 @@
 package kh.edu.istad.iam.domain.result;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ public record AuthUserResult(
         Set<String> authorities
 ) {
     public AuthUserResult {
-        authorities = Set.copyOf(authorities);
+        authorities = authorities == null
+                ? new HashSet<>()
+                : new HashSet<>(authorities);
     }
 }

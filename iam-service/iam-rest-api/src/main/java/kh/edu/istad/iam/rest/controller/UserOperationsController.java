@@ -163,7 +163,7 @@ public class UserOperationsController {
 
     @GetMapping("/identities")
     @PreAuthorize("hasAuthority('user:read')")
-    public java.util.List<IdentityResponse> identities(@PathVariable("permissionUuid") UUID userUuid) {
+    public java.util.List<IdentityResponse> identities(@PathVariable("userUuid") UUID userUuid) {
         return identities.execute(userUuid).stream().map(ResponseMapper::identity).toList();
     }
 
@@ -171,7 +171,7 @@ public class UserOperationsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
     public void unlink(
-            @PathVariable("permissionUuid") UUID userUuid,
+            @PathVariable("userUuid") UUID userUuid,
             @PathVariable("identityUuid") UUID identityUuid
     ) {
         unlinkIdentity.execute(new UnlinkIdentityCommand(

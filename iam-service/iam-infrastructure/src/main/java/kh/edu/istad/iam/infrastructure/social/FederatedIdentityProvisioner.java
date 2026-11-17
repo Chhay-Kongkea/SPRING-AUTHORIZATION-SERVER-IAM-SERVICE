@@ -79,10 +79,7 @@ public class FederatedIdentityProvisioner {
         return v == null ? null : v.toString();
     }
 
-    /**
-     * Provider payloads contain nulls (GitHub) and non-JSON types; both break the
-     * immutable copy / jsonb column. Keep only JSON-safe, non-null values.
-     */
+
     static Map<String, Object> jsonSafe(Map<String, Object> source) {
         Map<String, Object> safe = new LinkedHashMap<>();
         if (source == null) {
@@ -124,6 +121,6 @@ public class FederatedIdentityProvisioner {
             });
             return list;
         }
-        return v.toString(); // Instant, URL, ...
+        return v.toString();
     }
 }

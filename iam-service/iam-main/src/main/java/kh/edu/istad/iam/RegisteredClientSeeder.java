@@ -1,3 +1,4 @@
+
 package kh.edu.istad.iam;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -15,16 +16,20 @@ import java.util.UUID;
 
 @Component
 public class RegisteredClientSeeder implements ApplicationRunner {
+
     private final RegisteredClientRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final String bootstrapId;
     private final String bootstrapSecret;
     private final String webSecret;
 
-    public RegisteredClientSeeder(RegisteredClientRepository repository, PasswordEncoder passwordEncoder,
+    public RegisteredClientSeeder(
+            RegisteredClientRepository repository,
+            PasswordEncoder passwordEncoder,
             @Value("${iam.dcr.initial-client-id}") String bootstrapId,
             @Value("${iam.dcr.initial-client-secret}") String bootstrapSecret,
             @Value("${iam.web-client-secret:}") String webSecret) {
+
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.bootstrapId = bootstrapId;
@@ -34,10 +39,12 @@ public class RegisteredClientSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+
         if (bootstrapSecret.isBlank()) {
             throw new IllegalStateException(
                     "IAM_DCR_CLIENT_SECRET must be configured before starting the authorization server");
         }
+
         if (webSecret.isBlank()) {
             throw new IllegalStateException(
                     "IAM_WEB_CLIENT_SECRET must be configured before starting the authorization server");
@@ -63,11 +70,48 @@ public class RegisteredClientSeeder implements ApplicationRunner {
                     .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                     .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                     .redirectUri("http://localhost:8081/login/oauth2/code/iam")
-                    .scope("openid").scope("profile").scope("email").scope("phone").scope("address")
+                    .scope("openid")
+                    .scope("profile")
+                    .scope("email")
+                    .scope("phone")
+                    .scope("address")
                     .clientSettings(ClientSettings.builder()
                             .requireAuthorizationConsent(true)
                             .requireProofKey(true)
                             .build())
+                    .build());
+        }
+
+
+        if (repository.findByClientId("postman-confidential-client") == null) {
+            repository.save(RegisteredClient.withId(UUID.randomUUID().toString())
+                    .clientId("postman-confidential-client")
+                    .clientSecret(passwordEncoder.encode(
+                            "Postman-Dev-Secret-2026!"))
+                    .clientName("Postman Confidential Client")
+
+                    .clientAuthenticationMethod(
+                            ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+
+                    .authorizationGrantType(
+                            AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .authorizationGrantType(
+                            AuthorizationGrantType.REFRESH_TOKEN)
+
+                    .redirectUri(
+                            "https://oauth.pstmn.io/v1/callback")
+
+                    .scope("openid")
+                    .scope("profile")
+                    .scope("email")
+                    .scope("offline_access")
+
+
+                    .clientSettings(ClientSettings.builder()
+                            .requireProofKey(true)
+                            .requireAuthorizationConsent(false)
+                            .build())
+
                     .build());
         }
     }

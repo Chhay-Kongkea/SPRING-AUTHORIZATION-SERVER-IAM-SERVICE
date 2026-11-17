@@ -31,7 +31,6 @@ public class AuthenticationAuditListener {
             try {
                 recordLoginAttempt.execute(new RecordLoginAttemptCommand(username, false));
             } catch (NotFoundDomainException ignored) {
-                // Do not disclose whether an account exists.
             }
         }
     }

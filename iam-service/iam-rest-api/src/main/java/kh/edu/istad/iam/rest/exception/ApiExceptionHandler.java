@@ -66,7 +66,14 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(ConflictDomainException.class)
     ProblemDetail conflict(ConflictDomainException exception) {
-        return problem(HttpStatus.CONFLICT, "Conflict", exception.getMessage(), "conflict");
+        log.warn("Domain conflict: {}", exception.getMessage());
+
+        return problem(
+                HttpStatus.CONFLICT,
+                "Conflict",
+                exception.getMessage(),
+                "conflict"
+        );
     }
 
     @ExceptionHandler(InvalidCredentialsDomainException.class)
@@ -84,9 +91,14 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     ProblemDetail dataIntegrity(DataIntegrityViolationException exception) {
-        log.warn("Data integrity violation", exception);
-        return problem(HttpStatus.CONFLICT, "Conflict",
-                "The operation violates a uniqueness or integrity rule", "conflict");
+        log.error("Database integrity violation", exception);
+
+        return problem(
+                HttpStatus.CONFLICT,
+                "Conflict",
+                "The operation violates a uniqueness or integrity rule",
+                "conflict"
+        );
     }
 
     @ExceptionHandler(IllegalStateException.class)

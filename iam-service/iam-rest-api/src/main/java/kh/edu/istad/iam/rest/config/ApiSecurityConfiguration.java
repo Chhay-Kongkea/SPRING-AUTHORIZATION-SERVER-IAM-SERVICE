@@ -20,6 +20,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.net.URI;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
@@ -82,16 +83,20 @@ public class ApiSecurityConfiguration {
 
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
             Object claim = jwt.getClaims().get("authorities");
-            java.util.stream.Stream<String> permissions = claim instanceof Collection<?> values
+            Stream<String> permissions = claim instanceof Collection<?> values
                     ? values.stream().filter(String.class::isInstance).map(String.class::cast)
-                    : java.util.stream.Stream.empty();
+                    : Stream.empty();
+
+
 
             Object scopeClaim = jwt.getClaims().get("scope");
-            java.util.stream.Stream<String> scopes = scopeClaim instanceof String value
-                    ? java.util.Arrays.stream(value.split(" "))
-                    : java.util.stream.Stream.empty();
+            Stream<String> scopes = scopeClaim instanceof Collection<?> values
+                    ? values.stream().map(String::valueOf)
+                    : scopeClaim instanceof String value
+                    ? Arrays.stream(value.split(" "))
+                    : Stream.empty();
 
-            return java.util.stream.Stream.concat(permissions, scopes.map(scope -> "SCOPE_" + scope))
+            return Stream.concat(permissions, scopes.map(scope -> "SCOPE_" + scope))
                     .distinct()
                     .map(v -> (GrantedAuthority) new SimpleGrantedAuthority(v))
                     .toList();

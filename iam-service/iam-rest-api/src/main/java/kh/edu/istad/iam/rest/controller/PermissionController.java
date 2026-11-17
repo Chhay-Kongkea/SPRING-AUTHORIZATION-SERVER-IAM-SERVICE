@@ -53,10 +53,10 @@ public class PermissionController {
     @GetMapping
     @PreAuthorize("hasAuthority('permission:read')")
     public PageResult<PermissionResult> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt") String sort,
-            @RequestParam(defaultValue = "DESC") PageQuery.SortDirection direction
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size,
+            @RequestParam(name = "sort", defaultValue = "createdAt") String sort,
+            @RequestParam(name = "direction", defaultValue = "DESC") PageQuery.SortDirection direction
     ) {
         return listPermissions.execute(new PageQuery(page, size, sort, direction));
     }
