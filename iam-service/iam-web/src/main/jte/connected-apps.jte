@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#6d28d9">
 
-    <title>${messages.get("profile.connectedApps")} | IAM Platform</title>
+<title>${messages.get("profile.connectedApps")} | ${messages.get("brand.name")}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -542,6 +542,13 @@
                 animation-iteration-count: 1 !important;
             }
         }
+        /* Single-column account page */
+        .auth-container { display: block; max-width: 980px; margin: 0 auto; padding: 32px 20px; }
+        .auth-banner { min-height: auto; margin-bottom: 24px; padding: 28px 32px; border-radius: 20px; }
+        .auth-panel { min-height: auto; padding: 0; background: transparent; box-shadow: none; }
+        .apps-card { max-width: 820px; margin: 0 auto; }
+        .app-item:hover, .revoke-btn:hover, .back-link a:hover, .language-section a:hover { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-light); }
+        @media (max-width: 700px) { .auth-container { padding: 20px 14px; } .auth-banner { padding: 24px; } }
     </style>
 </head>
 
@@ -549,37 +556,6 @@
 
 <div class="auth-container">
 
-    <!-- ======================================
-         LEFT SIDE: BRANDING
-    ======================================= -->
-
-    <section class="auth-banner">
-
-        <div class="brand">
-            <span>IAM Platform</span>
-        </div>
-
-        <div class="banner-content">
-
-            <span class="banner-label">
-                Connected Services
-            </span>
-
-            <h2>Your Apps. Your Identity. Your Control.</h2>
-
-            <p>
-                Manage applications connected to your account.
-                Review their granted permissions and revoke access
-                whenever you no longer trust or need an application.
-            </p>
-
-        </div>
-
-        <div class="banner-footer">
-            © 2026 IAM Platform. All rights reserved.
-        </div>
-
-    </section>
 
     <!-- ======================================
          RIGHT SIDE: CONNECTED APPLICATIONS
@@ -596,8 +572,7 @@
                 </h1>
 
                 <p>
-                    Review the applications connected to your account
-                    and manage their access permissions.
+                    ${messages.get("apps.manageText")}
                 </p>
 
             </header>
@@ -605,7 +580,7 @@
             @if (!apps.isEmpty())
 
                 <div class="apps-summary">
-                    <span>Applications with account access</span>
+                    <span>${messages.get("apps.accessLabel")}</span>
 
                     <span class="apps-count">
                         ${apps.size()}
@@ -678,12 +653,10 @@
 
                     </div>
 
-                    <h2>No Connected Applications</h2>
+                        <h2>${messages.get("apps.none")}</h2>
 
                     <p>
-                        You haven't connected any external applications
-                        to your account yet. Applications you authorize
-                        will appear here.
+                        ${messages.get("apps.noneDescription")}
                     </p>
 
                 </section>
@@ -709,9 +682,7 @@
                 </svg>
 
                 <p>
-                    Only authorize applications you trust.
-                    Revoking access prevents an application from
-                    continuing to use its existing authorization.
+                    ${messages.get("apps.securityNotice")}
                 </p>
 
             </div>

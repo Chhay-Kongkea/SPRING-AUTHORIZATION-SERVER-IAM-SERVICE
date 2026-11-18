@@ -1,6 +1,15 @@
 server:
   port: ${SERVER_PORT:9000}
   forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: ${SESSION_TIMEOUT:30m}
+      cookie:
+        name: JSESSIONID
+        path: /
+        http-only: true
+        secure: ${SESSION_COOKIE_SECURE:false}
+        same-site: lax
 
 iam:
   issuer: ${IAM_ISSUER:http://localhost:9000}

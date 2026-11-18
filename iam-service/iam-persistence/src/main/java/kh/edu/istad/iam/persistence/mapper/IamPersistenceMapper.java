@@ -119,7 +119,7 @@ public interface IamPersistenceMapper {
     ) {
         UserRoleJpaEntity entity = new UserRoleJpaEntity();
 
-        entity.setId(userRole.getId());
+
         entity.setUser(user);
         entity.setRole(role);
         entity.setAssignedAt(userRole.getAssignedAt());
@@ -153,9 +153,6 @@ public interface IamPersistenceMapper {
         return entity;
     }
 
-    // =========================================================
-    // ROLE
-    // =========================================================
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uuid", expression = "java(role.getId().value())")

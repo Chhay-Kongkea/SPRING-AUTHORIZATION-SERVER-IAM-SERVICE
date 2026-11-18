@@ -17,7 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#6d28d9">
 
-    <title>${messages.get("profile.linkedAccounts")} | IAM Platform</title>
+<title>${messages.get("profile.linkedAccounts")} | ${messages.get("brand.name")}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -487,6 +487,7 @@
         .telegram-section {
             padding: 20px;
             margin-bottom: 23px;
+            margin-top: 10px;
             border: 1px solid var(--border);
             border-radius: 12px;
             background: #fcfbff;
@@ -642,6 +643,17 @@
                 animation-iteration-count: 1 !important;
             }
         }
+        /* Single-column account page */
+        .auth-container { display: block; max-width: 1040px; margin: 0 auto; padding: 32px 20px; }
+        .auth-banner { min-height: auto; margin-bottom: 24px; padding: 28px 32px; border-radius: 20px; }
+        .auth-panel { min-height: auto; padding: 0; background: transparent; box-shadow: none; }
+        .accounts-card { max-width: 900px; margin: 0 auto; }
+        .provider-link:hover, .unlink-btn:hover, .back-link:hover, .language-section a:hover { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-light); }
+        .telegram-provider-link { width: 100%; font: inherit; text-align: left; cursor: pointer; }
+        .telegram-provider-link .telegram-logo { color: #229ed9; }
+        .telegram-widget-host { margin-top: 10px; text-align: center; }
+        .telegram-section { padding: 0; border: 0; background: transparent; }
+        @media (max-width: 700px) { .auth-container { padding: 20px 14px; } .auth-banner { padding: 24px; } }
     </style>
 </head>
 
@@ -649,37 +661,7 @@
 
 <div class="auth-container">
 
-    <!-- ======================================
-         LEFT SIDE: BRANDING
-    ======================================= -->
 
-    <section class="auth-banner">
-
-        <div class="brand">
-            IAM Platform
-        </div>
-
-        <div class="banner-content">
-
-            <span class="banner-label">
-                Connected Identity
-            </span>
-
-            <h2>One Identity. Multiple Connections.</h2>
-
-            <p>
-                Connect your trusted social accounts to make signing in
-                easier. Manage your linked identities and maintain control
-                over your account connections.
-            </p>
-
-        </div>
-
-        <div class="banner-footer">
-            © 2026 IAM Platform. All rights reserved.
-        </div>
-
-    </section>
 
     <!-- ======================================
          RIGHT SIDE: LINKED ACCOUNTS
@@ -696,8 +678,7 @@
                 </h1>
 
                 <p>
-                    Manage the external accounts connected to your
-                    IAM identity.
+                    ${messages.get("accounts.manageText")}
                 </p>
 
             </header>
@@ -760,8 +741,8 @@
                     </div>
 
                     <div>
-                        <h2>Connected Accounts</h2>
-                        <p>Your currently linked identities</p>
+                        <h2>${messages.get("accounts.connectedTitle")}</h2>
+                        <p>${messages.get("accounts.connectedDescription")}</p>
                     </div>
 
                 </header>
@@ -875,11 +856,10 @@
 
                         </div>
 
-                        <h3>No Linked Accounts</h3>
+                        <h3>${messages.get("accounts.none")}</h3>
 
                         <p>
-                            You haven't connected any external identity
-                            providers yet. Connect an account below.
+                            ${messages.get("accounts.noneDescription")}
                         </p>
 
                     </div>
@@ -915,8 +895,8 @@
                     </div>
 
                     <div>
-                        <h2>Connect Another Account</h2>
-                        <p>Choose an identity provider</p>
+                        <h2>${messages.get("accounts.connectTitle")}</h2>
+                        <p>${messages.get("accounts.chooseProvider")}</p>
                     </div>
 
                 </header>
@@ -969,7 +949,7 @@
 
                             <span class="provider-link-action">
 
-                                Connect
+                                ${messages.get("accounts.connect")}
 
                                 <svg
                                         viewBox="0 0 24 24"
@@ -1020,7 +1000,7 @@
 
                             <span class="provider-link-action">
 
-                                Connect
+                                ${messages.get("accounts.connect")}
 
                                 <svg
                                         viewBox="0 0 24 24"
@@ -1071,7 +1051,7 @@
 
                             <span class="provider-link-action">
 
-                                Connect
+                                ${messages.get("accounts.connect")}
 
                                 <svg
                                         viewBox="0 0 24 24"
@@ -1095,24 +1075,17 @@
 
                 </div>
 
+
+                <section class="telegram-section">
+
+                    @template.partials.telegramWidget(
+                    messages = messages,
+                    botUsername = telegramBotUsername
+                    )
+
+                </section>
             </section>
 
-            <!-- ======================================
-                 TELEGRAM WIDGET
-            ======================================= -->
-
-            <section class="telegram-section">
-
-                @template.partials.telegramWidget(
-                messages = messages,
-                botUsername = telegramBotUsername
-                )
-
-            </section>
-
-            <!-- ======================================
-                 FOOTER ACTIONS
-            ======================================= -->
 
             <footer class="footer-actions">
 

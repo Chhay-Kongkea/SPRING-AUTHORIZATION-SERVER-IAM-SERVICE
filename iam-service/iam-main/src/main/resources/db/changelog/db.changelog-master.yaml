@@ -29,3 +29,13 @@ databaseChangeLog:
             relativeToChangelogFile: true
             splitStatements: true
             stripComments: false
+
+  - changeSet:
+      id: 004-assignment-optimistic-locking
+      author: istad
+      changes:
+        - sqlFile:
+            path: ddl/004-assignment-optimistic-locking.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: false

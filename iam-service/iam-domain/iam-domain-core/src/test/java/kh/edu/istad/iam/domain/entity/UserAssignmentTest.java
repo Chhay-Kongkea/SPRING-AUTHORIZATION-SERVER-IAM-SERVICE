@@ -53,4 +53,25 @@ class UserAssignmentTest {
         assertNotNull(user.getDeletedAt());
         assertEquals("admin-sub", user.getDeletedBy());
     }
+
+    @Test
+    void systemRoleCannotBeChangedOrDeleted() {
+        Role role = new Role(RoleId.generate(), "ADMIN", "Built-in administrator", true, "system");
+
+        assertThrows(IllegalStateException.class,
+                () -> role.updateDetails("OTHER", "", "admin-sub"));
+        assertThrows(IllegalStateException.class,
+                () -> role.softDelete("admin-sub"));
+    }
+
+    @Test
+    void expiredRoleAssignmentIsNoLongerActive() {
+        User user = new User(UserId.generate(), "sokdara", "dara@istad.co",
+                "bcrypt-hash", "Dara", "Sok", "km", "test");
+
+        user.assignRole(RoleId.generate(), "admin-sub",
+                java.time.Instant.now().minusSeconds(1), "Expired temporary role");
+
+        assertFalse(user.getRoles().getFirst().isActive());
+    }
 }

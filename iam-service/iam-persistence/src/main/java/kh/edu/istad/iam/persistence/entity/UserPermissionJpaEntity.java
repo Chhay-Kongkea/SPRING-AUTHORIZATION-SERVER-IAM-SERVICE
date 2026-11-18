@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import kh.edu.istad.iam.domain.valueobject.PermissionEffect;
 
@@ -54,6 +55,10 @@ public class UserPermissionJpaEntity {
 
     @Column(name = "reason", length = 255)
     private String reason;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 
     public UserPermissionJpaEntity() {
 
@@ -137,5 +142,13 @@ public class UserPermissionJpaEntity {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

@@ -2,7 +2,6 @@ package kh.edu.istad.iam.infrastructure.social;
 
 import kh.edu.istad.iam.domain.usecase.LoadUserForAuthenticationUseCase;
 import kh.edu.istad.iam.domain.valueobject.IdentityProvider;
-import kh.edu.istad.iam.infrastructure.security.IamPrincipal;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;

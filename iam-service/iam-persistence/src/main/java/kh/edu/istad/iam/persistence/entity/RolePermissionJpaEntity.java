@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import java.time.Instant;
 
@@ -46,6 +47,10 @@ public class RolePermissionJpaEntity {
 
     @Column(name = "reason", length = 255)
     private String reason;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 
     public RolePermissionJpaEntity() {
 
@@ -121,5 +126,13 @@ public class RolePermissionJpaEntity {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

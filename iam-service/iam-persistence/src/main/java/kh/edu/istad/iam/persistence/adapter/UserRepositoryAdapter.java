@@ -113,15 +113,24 @@ public class UserRepositoryAdapter implements UserRepository {
                             "Role not found: " + userRole.getRoleId().value()
                     ));
 
-            UserRoleJpaEntity assignmentEntity = mapper.toJpaEntity(
-                    userRole,
-                    userEntity,
-                    roleEntity
-            );
+            UserRoleJpaEntity assignmentEntity;
 
             if (existing != null) {
-                assignmentEntity.setId(existing.getId());
+
+                assignmentEntity = existing;
+            } else {
+
+                assignmentEntity = new UserRoleJpaEntity();
             }
+
+            assignmentEntity.setUser(userEntity);
+            assignmentEntity.setRole(roleEntity);
+            assignmentEntity.setAssignedAt(userRole.getAssignedAt());
+            assignmentEntity.setAssignedBy(userRole.getAssignedBy());
+            assignmentEntity.setExpiresAt(userRole.getExpiresAt());
+            assignmentEntity.setRevokedAt(userRole.getRevokedAt());
+            assignmentEntity.setRevokedBy(userRole.getRevokedBy());
+            assignmentEntity.setReason(userRole.getReason());
 
             userRoleJpaRepository.save(assignmentEntity);
         }

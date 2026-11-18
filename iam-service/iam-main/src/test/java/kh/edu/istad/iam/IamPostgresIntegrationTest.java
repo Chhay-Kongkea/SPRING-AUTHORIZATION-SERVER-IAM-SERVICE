@@ -64,4 +64,17 @@ class IamPostgresIntegrationTest {
 
         assertThat(assignments).isEqualTo(1);
     }
+
+    @Test
+    void auditedAssignmentTablesHaveOptimisticLockColumns() {
+        Integer columns = jdbcTemplate.queryForObject("""
+                SELECT COUNT(*)
+                FROM information_schema.columns
+                WHERE table_schema = current_schema()
+                  AND column_name = 'version'
+                  AND table_name IN ('user_roles', 'role_permissions', 'user_permissions')
+                """, Integer.class);
+
+        assertThat(columns).isEqualTo(3);
+    }
 }

@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#6d28d9">
 
-    <title>${messages.get("profile.changePassword")} | IAM Platform</title>
+<title>${messages.get("profile.changePassword")} | ${messages.get("brand.name")}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -473,6 +473,13 @@
                 font-size: 26px;
             }
         }
+        /* Single-column account page */
+        .auth-container { display: block; max-width: 920px; margin: 0 auto; padding: 32px 20px; }
+        .auth-banner { min-height: auto; margin-bottom: 24px; padding: 28px 32px; border-radius: 20px; }
+        .auth-panel { min-height: auto; padding: 0; background: transparent; box-shadow: none; }
+        .form-card { max-width: 720px; margin: 0 auto; }
+        .submit-btn:hover, .password-toggle:hover, .back-link a:hover, .language-section a:hover { color: var(--primary-dark); background: var(--primary-light); }
+        @media (max-width: 700px) { .auth-container { padding: 20px 14px; } .auth-banner { padding: 24px; } }
     </style>
 </head>
 
@@ -480,37 +487,6 @@
 
 <div class="auth-container">
 
-    <!-- ======================================
-         LEFT SIDE: BRANDING
-    ======================================= -->
-
-    <section class="auth-banner">
-
-        <div class="brand">
-            <span>IAM Platform</span>
-        </div>
-
-        <div class="banner-content">
-
-            <span class="banner-label">
-                Account Security
-            </span>
-
-            <h2>Protect Your Digital Identity.</h2>
-
-            <p>
-                Keep your account secure by creating a strong password.
-                Choose a password that is unique and difficult for others
-                to guess.
-            </p>
-
-        </div>
-
-        <div class="banner-footer">
-            © 2026 IAM Platform. All rights reserved.
-        </div>
-
-    </section>
 
     <!-- ======================================
          RIGHT SIDE: CHANGE PASSWORD
@@ -527,8 +503,7 @@
                 </h1>
 
                 <p>
-                    Update your password to keep your account safe.
-                    Enter your current password and choose a new one.
+                ${messages.get("password.instructions")}
                 </p>
 
             </header>
@@ -567,7 +542,7 @@
                                 id="currentPassword"
                                 type="password"
                                 name="currentPassword"
-                                placeholder="Enter your current password"
+                                placeholder="${messages.get("password.currentPlaceholder")}"
                                 autocomplete="current-password"
                                 required>
 
@@ -575,7 +550,7 @@
                                 class="password-toggle"
                                 type="button"
                                 data-password-toggle
-                                aria-label="Show password"
+                                aria-label="${messages.get("login.showPassword")}"
                                 aria-pressed="false">
 
                             <svg
@@ -627,7 +602,7 @@
                                 id="newPassword"
                                 type="password"
                                 name="newPassword"
-                                placeholder="Enter your new password"
+                                placeholder="${messages.get("password.newPlaceholder")}"
                                 autocomplete="new-password"
                                 required
                                 minlength="12">
@@ -636,7 +611,7 @@
                                 class="password-toggle"
                                 type="button"
                                 data-password-toggle
-                                aria-label="Show password"
+                                aria-label="${messages.get("login.showPassword")}"
                                 aria-pressed="false">
 
                             <svg
@@ -673,7 +648,7 @@
                     </div>
 
                     <p class="password-hint">
-                        Your new password must contain at least 12 characters.
+                    ${messages.get("password.rule")}
                     </p>
 
                 </div>
@@ -692,7 +667,7 @@
                                 id="confirmPassword"
                                 type="password"
                                 name="confirmPassword"
-                                placeholder="Confirm your new password"
+                                placeholder="${messages.get("password.confirmPlaceholder")}"
                                 autocomplete="new-password"
                                 required>
 
@@ -700,7 +675,7 @@
                                 class="password-toggle"
                                 type="button"
                                 data-password-toggle
-                                aria-label="Show password"
+                                aria-label="${messages.get("login.showPassword")}"
                                 aria-pressed="false">
 
                             <svg
@@ -812,7 +787,7 @@
 
                 button.setAttribute(
                     "aria-label",
-                    "Show password"
+                    "${messages.get("login.showPassword")}"
                 );
 
                 button.setAttribute(
@@ -833,7 +808,7 @@
 
                     button.setAttribute(
                         "aria-label",
-                        showPassword ? "Hide password" : "Show password"
+                        showPassword ? "${messages.get("login.hidePassword")}" : "${messages.get("login.showPassword")}"
                     );
 
                     button.setAttribute(

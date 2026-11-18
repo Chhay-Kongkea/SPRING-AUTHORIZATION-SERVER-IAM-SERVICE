@@ -52,7 +52,6 @@ public class TelegramLoginController {
         String suppliedHash = data.get("hash");
         String authDate = data.get("auth_date");
         String id = data.get("id");
-        String email = data.get("email");
         if (suppliedHash == null || authDate == null || id == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Telegram authentication payload is incomplete");
@@ -83,12 +82,12 @@ public class TelegramLoginController {
         Authentication current = SecurityContextHolder.getContext().getAuthentication();
         boolean linking = current != null && current.isAuthenticated()
                 && current.getPrincipal() instanceof IamPrincipal;
-        if (!linking && (email == null || email.isBlank())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "A user-provided email address is required for a new Telegram account");
-        }
 
         Map<String, Object> attributes = new TreeMap<>(data);
+        String email = data.get("email");
+        // Telegram does not provide an email address. If the optional form field
+        // is empty, the domain use case creates a provider-scoped placeholder
+        // address and keeps it unverified until the user adds a real email.
         if (email != null && !email.isBlank()) attributes.put("email", email);
         attributes.put("email_verified", false);
         String displayName = (data.getOrDefault("first_name", "") + " "

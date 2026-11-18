@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#6d28d9">
 
-    <title>${messages.get("consent.title")} | IAM Platform</title>
+<title>${messages.get("consent.title")} | ${messages.get("brand.name")}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -536,6 +536,13 @@
                 animation-iteration-count: 1 !important;
             }
         }
+        /* Single-column consent page */
+        .auth-container { display: block; max-width: 920px; margin: 0 auto; padding: 32px 20px; }
+        .auth-banner { min-height: auto; margin-bottom: 24px; padding: 28px 32px; border-radius: 20px; }
+        .auth-panel { min-height: auto; padding: 0; background: transparent; box-shadow: none; }
+        .consent-card { max-width: 760px; margin: 0 auto; }
+        .allow-btn:hover, .cancel-btn:hover, .language-section a:hover { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-light); }
+        @media (max-width: 700px) { .auth-container { padding: 20px 14px; } .auth-banner { padding: 24px; } }
     </style>
 </head>
 
@@ -550,7 +557,7 @@
     <section class="auth-banner">
 
         <div class="brand">
-            <span>IAM Platform</span>
+                    <span>${messages.get("brand.name")}</span>
         </div>
 
         <div class="banner-content">
@@ -559,18 +566,16 @@
                 OAuth2 Authorization
             </span>
 
-            <h2>Your Data. Your Choice. Your Control.</h2>
+                <h2>${messages.get("consent.heroTitle")}</h2>
 
             <p>
-                You are in control of your digital identity.
-                Review the permissions requested by this application
-                before deciding whether to grant access.
+                ${messages.get("consent.heroText")}
             </p>
 
         </div>
 
         <div class="banner-footer">
-            © 2026 IAM Platform. All rights reserved.
+            © 2026 ${messages.get("brand.name")}. ${messages.get("common.allRightsReserved")}
         </div>
 
     </section>
@@ -622,7 +627,7 @@
                 <div class="client-info">
 
                     <span class="client-label">
-                        APPLICATION REQUESTING ACCESS
+                        ${messages.get("consent.clientLabel")}
                     </span>
 
                     <strong class="client-name">
@@ -637,10 +642,10 @@
 
             <div class="permissions-header">
 
-                <h2>Requested Permissions</h2>
+                <h2>${messages.get("consent.requestedScopes")}</h2>
 
                 <p>
-                    This application wants permission to access:
+                    ${messages.get("consent.requestedDescription")}
                 </p>
 
             </div>
@@ -705,9 +710,7 @@
                 </svg>
 
                 <p>
-                    Only approve applications you trust.
-                    Make sure you understand the permissions before
-                    granting access to your account.
+                    ${messages.get("consent.securityNotice")}
                 </p>
 
             </div>

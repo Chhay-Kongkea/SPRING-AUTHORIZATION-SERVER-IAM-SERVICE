@@ -27,6 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.jackson.SecurityJacksonModules;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
@@ -50,7 +51,9 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Refr
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
@@ -81,7 +84,9 @@ public class AuthorizationServerConfiguration {
             OAuth2AuthorizationConsentService consentService,
             AuthorizationServerSettings serverSettings,
             OAuth2TokenGenerator<?> tokenGenerator,
-            OidcClaimsMapper claimsMapper) throws Exception {
+            OidcClaimsMapper claimsMapper,
+            SecurityContextRepository securityContextRepository,
+            RequestCache requestCache) throws Exception {
 
         MediaTypeRequestMatcher htmlMatcher =
                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML);
@@ -108,9 +113,20 @@ public class AuthorizationServerConfiguration {
                                             mapUserInfo(context, users, claimsMapper))));
                 })
                 .authorizeHttpRequests(authorize ->
-                        authorize.anyRequest().authenticated())
+                        authorize
+                                // Dynamic registration is a privileged operation. The
+                                // bootstrap client must first obtain a client-credentials
+                                // token carrying the dedicated client.create scope.
+                                .requestMatchers("/connect/register")
+                                .hasAuthority("SCOPE_client.create")
+                                .anyRequest().authenticated())
                 .oauth2ResourceServer(resource ->
                         resource.jwt(Customizer.withDefaults()))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .securityContext(context -> context
+                        .securityContextRepository(securityContextRepository))
+                .requestCache(cache -> cache.requestCache(requestCache))
                 .exceptionHandling(exceptions ->
                         exceptions.defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),

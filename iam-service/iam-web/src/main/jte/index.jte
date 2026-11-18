@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#6d28d9">
 
-    <title>${messages.get("profile.title")} | IAM Platform</title>
+<title>${messages.get("profile.title")} | ${messages.get("brand.name")}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,6 +45,7 @@
         }
 
         body {
+            padding-top: 10px;
             min-height: 100vh;
             font-family: "Noto Sans", sans-serif;
             background: var(--background);
@@ -571,44 +572,18 @@
                 animation-iteration-count: 1 !important;
             }
         }
+        /* Single-column account dashboard */
+        .auth-container { display: block; max-width: 1120px; margin: 0 auto; padding: 32px 20px; }
+        .auth-banner { min-height: auto; margin-bottom: 24px; padding: 28px 32px; border-radius: 20px; }
+        .auth-panel { min-height: auto; padding: 0; background: transparent; box-shadow: none; }
+        .profile-card { max-width: 980px; margin: 0 auto; }
+        .navigation-link:hover, .logout-btn:hover, .language-section a:hover { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-light); }
+        @media (max-width: 700px) { .auth-container { padding: 20px 14px; } .auth-banner { padding: 24px; } }
     </style>
 </head>
 
 <body>
 
-<div class="auth-container">
-
-    <!-- ======================================
-         LEFT SIDE: BRANDING
-    ======================================= -->
-
-    <section class="auth-banner">
-
-        <div class="brand">
-            <span>IAM Platform</span>
-        </div>
-
-        <div class="banner-content">
-
-            <span class="banner-label">
-                Identity Dashboard
-            </span>
-
-            <h2>Your Identity. Your Security. Your Control.</h2>
-
-            <p>
-                Manage your personal information, review your account
-                permissions, and control the applications connected
-                to your digital identity.
-            </p>
-
-        </div>
-
-        <div class="banner-footer">
-            © 2026 IAM Platform. All rights reserved.
-        </div>
-
-    </section>
 
     <!-- ======================================
          RIGHT SIDE: PROFILE DASHBOARD
@@ -625,8 +600,7 @@
                 </h1>
 
                 <p>
-                    Manage your account information, roles,
-                    permissions, and security settings.
+                    ${messages.get("profile.manageText")}
                 </p>
 
             </header>
@@ -686,7 +660,7 @@
 
                     <div>
                         <h2>${messages.get("profile.claims")}</h2>
-                        <p>Your account identity information</p>
+                        <p>${messages.get("profile.claimsDescription")}</p>
                     </div>
 
                 </header>
@@ -716,7 +690,7 @@
                 @else
 
                     <p class="empty-text">
-                        No account claims are available.
+                        ${messages.get("profile.noClaims")}
                     </p>
 
                 @endif
@@ -751,7 +725,7 @@
 
                     <div>
                         <h2>${messages.get("profile.roles")}</h2>
-                        <p>Roles assigned to your account</p>
+                        <p>${messages.get("profile.rolesDescription")}</p>
                     </div>
 
                 </header>
@@ -788,7 +762,7 @@
                 @else
 
                     <p class="empty-text">
-                        No roles are assigned to your account.
+                        ${messages.get("profile.noRoles")}
                     </p>
 
                 @endif
@@ -824,7 +798,7 @@
 
                     <div>
                         <h2>${messages.get("profile.permissions")}</h2>
-                        <p>Actions your account is authorized to perform</p>
+                        <p>${messages.get("profile.permissionsDescription")}</p>
                     </div>
 
                 </header>
@@ -861,7 +835,7 @@
                 @else
 
                     <p class="empty-text">
-                        No permissions are available.
+                        ${messages.get("profile.noPermissions")}
                     </p>
 
                 @endif
@@ -875,10 +849,10 @@
             <section class="navigation-section">
 
                 <h2 class="navigation-title">
-                    Account Management
+                    ${messages.get("profile.accountManagement")}
                 </h2>
 
-                <nav class="navigation-grid" aria-label="Account management">
+                <nav class="navigation-grid" aria-label="${messages.get("profile.accountManagement")} ">
 
                     <!-- EDIT PROFILE -->
 
@@ -1051,7 +1025,7 @@
 
     </section>
 
-</div>
+
 
 </body>
 </html>

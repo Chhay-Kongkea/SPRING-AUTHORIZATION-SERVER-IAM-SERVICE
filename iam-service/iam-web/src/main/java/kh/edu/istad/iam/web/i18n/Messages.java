@@ -14,7 +14,6 @@ public class Messages {
         this.locale = locale;
     }
 
-    /** Resolves {@code key} for the current locale; unknown keys render as the key itself. */
     public String get(String key, Object... args) {
         return source.getMessage(key, args, key, locale);
     }

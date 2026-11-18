@@ -15,9 +15,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#6d28d9">
+<meta name="theme-color" content="#6d28d9">
 
-    <title>${messages.get("login.title")} | IAM Platform</title>
+<title>${messages.get("login.title")} | ${messages.get("brand.name")}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -556,6 +556,181 @@
                 font-size: 26px;
             }
         }
+        /* RentalHub-inspired two-panel auth shell. Form actions and localization stay unchanged. */
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #ede9fe;
+            --text: #17233d;
+            --muted: #718096;
+            --border: #e5e9f0;
+            --background: #f5f7fb;
+        }
+
+        body { background: #f8f7fc; }
+
+        .auth-container {
+            width: min(1440px, 100%);
+            margin: 0 auto;
+            padding: 24px;
+            gap: 24px;
+            background: #f5f7fb;
+        }
+
+        .auth-banner {
+            min-height: calc(100vh - 48px);
+            padding: 42px 46px;
+            border-radius: 28px;
+            background: linear-gradient(145deg, #4c1d95 0%, #6d28d9 45%, #9333ea 100%);
+            box-shadow: 0 22px 55px rgba(23, 35, 61, 0.16);
+        }
+
+        .auth-banner::before,
+        .auth-banner::after { background: rgba(255, 255, 255, 0.055); }
+
+        .brand-icon {
+            background: var(--primary);
+            border-color: transparent;
+            box-shadow: 0 9px 20px rgba(124, 58, 237, 0.3);
+        }
+
+        .banner-content { padding: 45px 0; }
+
+        .banner-label {
+            color: #ffd0c5;
+            background: rgba(124, 58, 237, 0.17);
+            border-color: rgba(252, 165, 165, 0.3);
+        }
+
+        .auth-panel {
+            min-height: calc(100vh - 48px);
+            padding: 54px clamp(28px, 5vw, 76px);
+            border-radius: 28px;
+            box-shadow: 0 22px 55px rgba(23, 35, 61, 0.08);
+        }
+
+        .form-group input {
+            min-height: 52px;
+            border-radius: 12px;
+            border-color: #dce2eb;
+            background: #fbfcfe;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+            background: #fff;
+        }
+
+        .submit-btn {
+            min-height: 52px;
+            border-radius: 12px;
+            background: var(--primary);
+            box-shadow: 0 10px 22px rgba(124, 58, 237, 0.22);
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 12px 25px rgba(124, 58, 237, 0.3);
+        }
+
+        .social-login a {
+            border-radius: 12px;
+            border-color: #e0e5ed;
+            color: var(--text);
+        }
+
+        .social-login a:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .register-link a,
+        .language-section a { color: var(--primary-dark); }
+
+        @media (max-width: 900px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+                padding: 16px;
+                gap: 16px;
+            }
+
+            .auth-banner,
+            .auth-panel {
+                min-height: auto;
+                border-radius: 22px;
+            }
+
+            .auth-banner { padding: 30px; }
+            .banner-content { margin: 45px 0 25px; padding: 0; }
+            .auth-panel { padding: 42px 28px; }
+        }
+
+        body { font-size: 16px; }
+        .banner-content p { font-size: 16px; }
+        .login-header p,
+        .form-group label,
+        .social-login a,
+        .register-link,
+        .language-section,
+        .telegram-auth-panel p,
+        .telegram-auth-panel label { font-size: 14px; }
+
+        .telegram-section { margin-top: 18px; }
+
+        .telegram-trigger {
+            width: 100%;
+            min-height: 52px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 16px;
+            border: 1px solid #dfe5ed;
+            border-radius: 12px;
+            background: #fff;
+            color: #17233d;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: border-color .2s ease, background .2s ease, transform .2s ease;
+        }
+
+        .telegram-trigger svg { width: 20px; height: 20px; color: #229ed9; }
+
+        .telegram-trigger:hover {
+            border-color: #229ed9;
+            background: #f0f9ff;
+            transform: translateY(-1px);
+        }
+
+        .telegram-auth-panel {
+            display: grid;
+            gap: 9px;
+            margin-top: 12px;
+            padding: 16px;
+            border: 1px solid #e5e9f0;
+            border-radius: 14px;
+            background: #f8fafc;
+        }
+
+        .telegram-auth-panel p { margin: 0 0 2px; color: #718096; line-height: 1.55; }
+        .telegram-auth-panel label { color: #17233d; font-weight: 700; }
+        .telegram-auth-panel input {
+            min-height: 48px;
+            padding: 0 13px;
+            border: 1px solid #dce2eb;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .telegram-auth-panel input:focus {
+            outline: none;
+            border-color: #229ed9;
+            box-shadow: 0 0 0 4px rgba(34, 158, 217, .12);
+        }
+
+        .telegram-widget { min-height: 44px; margin-top: 4px; }
     </style>
 </head>
 
@@ -570,21 +745,20 @@
     <section class="auth-banner">
 
         <div class="brand">
-            <span>IAM Platform</span>
+            <span>${messages.get("brand.name")}</span>
         </div>
 
         <div class="banner-content">
 
-            <h2>Welcome Back to Your Digital Space.</h2>
+            <h2>${messages.get("login.welcomeTitle")}</h2>
 
             <p>
-                Sign in to access your account, manage your identity,
-                and enjoy a secure authentication experience.
+                ${messages.get("login.welcomeText")}
             </p>
         </div>
 
         <div class="banner-footer">
-            © 2026 IAM Platform. All rights reserved.
+            © 2026 ${messages.get("brand.name")}. ${messages.get("common.allRightsReserved")}
         </div>
 
     </section>
@@ -598,8 +772,7 @@
                 <h1>${messages.get("login.title")}</h1>
 
                 <p>
-                    Welcome! Please enter your credentials
-                    to access your account.
+                    ${messages.get("login.credentialsHint")}
                 </p>
             </header>
 
@@ -644,7 +817,7 @@
                             id="username"
                             name="username"
                             type="text"
-                            placeholder="Enter your username or email"
+                            placeholder="${messages.get("login.usernamePlaceholder")}"
                             autocomplete="username"
                             required>
 
@@ -664,7 +837,7 @@
                                 id="password"
                                 type="password"
                                 name="password"
-                                placeholder="Enter your password"
+                                placeholder="${messages.get("login.passwordPlaceholder")}"
                                 autocomplete="current-password"
                                 required>
 
@@ -672,7 +845,7 @@
                                 class="password-toggle"
                                 type="button"
                                 id="passwordToggle"
-                                aria-label="Show password"
+                                aria-label="${messages.get("login.showPassword")}"
                                 aria-pressed="false">
 
                             <!-- CLOSED EYE: PASSWORD HIDDEN -->
@@ -723,7 +896,7 @@
                 <!-- SUBMIT -->
 
                 <button class="submit-btn" type="submit">
-                    ${messages.get("login.title")}
+                    ${messages.get("login.signIn")}
                 </button>
 
             </form>
@@ -733,7 +906,7 @@
             @if (googleEnabled || githubEnabled || facebookEnabled)
 
                 <div class="divider">
-                    OR CONTINUE WITH
+                    ${messages.get("login.orContinueWith")}
                 </div>
 
                 <div class="social-login">
@@ -810,23 +983,27 @@
 
             <!-- TELEGRAM LOGIN -->
 
-            <div class="telegram-section">
+            @if (telegramBotUsername != null && !telegramBotUsername.isBlank())
+                <div class="telegram-section">
+                    <button class="telegram-trigger" type="button" id="telegramTrigger" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="currentColor" d="M21.8 3.4 18.5 20c-.3 1.2-1 1.5-2 .9l-5.6-4.1-2.7 2.6c-.3.3-.5.5-1 .5l.4-5.7L18 6.3c.4-.4-.1-.6-.6-.2L6.2 13.2.8 11.5c-1.2-.4-1.2-1.2.2-1.7L21 2.1c.9-.3 1.7.2.8 1.3Z"/>
+                        </svg>
+                        <span>${messages.get("login.continueWith", "Telegram")}</span>
+                    </button>
 
-                @template.partials.telegramWidget(
-                messages = messages,
-                botUsername = telegramBotUsername
-                )
 
-            </div>
+                </div>
+            @endif
 
             <!-- REGISTER -->
 
             <div class="register-link">
 
-                Don't have an account?
+                ${messages.get("login.registerPrompt")}
 
                 <a href="/register">
-                    ${messages.get("register.title")}
+                    ${messages.get("login.register")}
                 </a>
 
             </div>
@@ -884,7 +1061,7 @@
 
             passwordToggle.setAttribute(
                 "aria-label",
-                "Show password"
+                "${messages.get("login.showPassword")}"
             );
 
             passwordToggle.setAttribute(
@@ -926,7 +1103,7 @@
                 // Update accessibility attributes.
                 passwordToggle.setAttribute(
                     "aria-label",
-                    showPassword ? "Hide password" : "Show password"
+                    showPassword ? "${messages.get("login.hidePassword")}" : "${messages.get("login.showPassword")}"
                 );
 
                 passwordToggle.setAttribute(
@@ -953,6 +1130,39 @@
 
     })();
 </script>
+
+@if (telegramBotUsername != null && !telegramBotUsername.isBlank())
+    <script>
+        (function () {
+            const trigger = document.getElementById("telegramTrigger");
+            const panel = document.getElementById("telegramAuthPanel");
+            const widgetHost = document.getElementById("telegramWidget");
+
+            if (!trigger || !panel || !widgetHost) return;
+
+            trigger.addEventListener("click", function () {
+                panel.hidden = false;
+                trigger.setAttribute("aria-expanded", "true");
+
+                if (widgetHost.dataset.loaded === "true") return;
+                const script = document.createElement("script");
+                script.async = true;
+                script.src = "https://telegram.org/js/telegram-widget.js?22";
+                script.dataset.telegramLogin = "${telegramBotUsername}";
+                script.dataset.size = "large";
+                script.dataset.requestAccess = "write";
+                script.dataset.onauth = "onTelegramAuth(user)";
+                widgetHost.appendChild(script);
+                widgetHost.dataset.loaded = "true";
+            });
+
+            window.onTelegramAuth = function (user) {
+                const params = new URLSearchParams(user);
+                window.location.href = "/auth/telegram/callback?" + params.toString();
+            };
+        })();
+    </script>
+@endif
 
 </body>
 </html>

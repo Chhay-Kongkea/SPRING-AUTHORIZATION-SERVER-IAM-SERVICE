@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#6d28d9">
 
-    <title>${messages.get("profile.edit")} | IAM Platform</title>
+<title>${messages.get("profile.edit")} | ${messages.get("brand.name")}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -469,6 +469,13 @@
                 animation-iteration-count: 1 !important;
             }
         }
+        /* Single-column account page */
+        .auth-container { display: block; max-width: 920px; margin: 0 auto; padding: 32px 20px; }
+        .auth-banner { min-height: auto; margin-bottom: 24px; padding: 28px 32px; border-radius: 20px; }
+        .auth-panel { min-height: auto; padding: 0; background: transparent; box-shadow: none; }
+        .profile-card { max-width: 760px; margin: 0 auto; }
+        .save-btn:hover, .back-link:hover, .language-section a:hover { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-light); }
+        @media (max-width: 700px) { .auth-container { padding: 20px 14px; } .auth-banner { padding: 24px; } }
     </style>
 </head>
 
@@ -480,33 +487,7 @@
          LEFT SIDE: BRANDING
     ======================================= -->
 
-    <section class="auth-banner">
 
-        <div class="brand">
-            IAM Platform
-        </div>
-
-        <div class="banner-content">
-
-            <span class="banner-label">
-                Personal Information
-            </span>
-
-            <h2>Make Your Identity Yours.</h2>
-
-            <p>
-                Keep your personal information up to date.
-                Manage your profile details and customize your
-                account preferences in one secure place.
-            </p>
-
-        </div>
-
-        <div class="banner-footer">
-            © 2026 IAM Platform. All rights reserved.
-        </div>
-
-    </section>
 
     <!-- ======================================
          RIGHT SIDE: EDIT PROFILE FORM
@@ -523,7 +504,7 @@
                 </h1>
 
                 <p>
-                    Update your personal information and account preferences.
+                ${messages.get("profileEdit.instructions")}
                 </p>
 
             </header>
@@ -625,7 +606,7 @@
                             id="nickname"
                             name="nickname"
                             value="${values.getOrDefault("nickname", "")}"
-                            autocomplete="nickname"
+                            autocomplete="nick-name"
                             maxlength="100">
 
                 </div>
@@ -681,7 +662,7 @@
                     </select>
 
                     <p class="field-hint">
-                        Choose the language preference for your account.
+                        ${messages.get("profileEdit.localeHint")}
                     </p>
 
                 </div>

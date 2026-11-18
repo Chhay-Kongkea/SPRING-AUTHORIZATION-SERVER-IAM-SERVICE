@@ -1,4 +1,3 @@
-
 volumes:
   iam-pg-vol:
     driver: local
@@ -14,8 +13,8 @@ services:
 
     environment:
       POSTGRES_DB: iam_db
-      POSTGRES_USER: ${DB_USERNAME:?DB_USERNAME is required}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
 
     volumes:
       - iam-pg-vol:/var/lib/postgresql
